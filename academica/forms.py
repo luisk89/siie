@@ -129,8 +129,7 @@ class AlumnosForm(forms.ModelForm):
                              'anio_egreso', 'promedio_bachiller'),
                     Fieldset('Control Escolar', HTML("""<a data-toggle="modal"
                         data-target="#modalPlan"
-                        id="modal-button"><i class="fa fa-plus-circle"></i></a>"""), 'plan', 'semestre',
-                             'no_expediente','matricula',
+                        id="modal-button"><i class="fa fa-plus-circle"></i></a>"""), 'plan', 'semestre','matricula',
                              'condicionado', HTML("""<a data-toggle="modal"
                         data-target="#modalGrupo"
                         id="modal-button"><i class="fa fa-plus-circle"></i></a>"""),
