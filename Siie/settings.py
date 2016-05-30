@@ -108,7 +108,7 @@ LOGIN_URL = "login"
 DEFAULT_FROM_EMAIL = 'rraidel89@gmail.com'
 
 ACCOUNT_EMAIL_REQUIRED = True
-#ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
 # GMAIL SETTINGS EXAMPLE
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

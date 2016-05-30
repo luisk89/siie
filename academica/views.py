@@ -10,6 +10,7 @@ from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormVi
 from django.views.generic.list import ListView
 from django.contrib import messages
 from academica.util import LoggedInMixin
+from django.contrib.auth.models import Group
 
 
 
@@ -51,18 +52,22 @@ class AlumnoCreate(LoggedInMixin,CreateView):
         nombre = form.cleaned_data['nom_alumno']
         apellido_paterno = form.cleaned_data['apellido_paterno']
         avatar = form.cleaned_data['foto']
-        expediente = form.cleaned_data['no_expediente']
+        matricula = form.cleaned_data['matricula']
 
         # poniendo como usuario la primeraletra del nombre y el apellido->Ej. rrosabal
         usuario = username[0] + apellido_paterno
 
         # en el formulario esta la validacion para el username y el email (el user name que se crea es el nombre del alumno eso tenemos que cambiarlo, hacer una mescla nombre mas apellido o algo asi)
         user = get_user_model().objects.create_user(usuario, email, avatar=avatar, first_name=nombre,
-                                                    last_name=apellido_paterno,no_expediente=expediente)
+                                                    last_name=apellido_paterno,no_expediente=matricula)
         user.set_password(usuario)
+        g = Group.objects.get(name='Estudiante')
+        g.user_set.add(user)
         user.save()
         messages.success(self.request, 'Alumno Creado Correctamente')
         messages.success(self.request, 'Usuario Creado Correctamente')
+        messages.success(self.request, 'Usuario:  '+ usuario + '  Password:  '+ usuario )
+
         return super(AlumnoCreate, self).form_valid(form)
 
 
