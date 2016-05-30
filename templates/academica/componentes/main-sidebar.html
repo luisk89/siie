@@ -41,35 +41,7 @@
                                 class="fa fa-angle-left pull-right"></i>
                         </a>
                         <ul class="treeview-menu">
-                            <li><a href="{% url 'list-semestre' %}">Ciclo Semestral</a></li>
-                            <li><a href="/academica/planEstudio/list/">Plan de Estudio</a></li>
-                            <li><a href="/academica/materia/list/">Materias</a></li>
-                            <li><a href="{% url 'list-aula' %}">Aulas</a></li>
-                            <li><a href="{% url 'list-carrera' %}">Carreras</a></li>
-                        </ul>
-                    </li>
-                {% endif %}
-            {% endfor %}
-            <li class="treeview">
-                <a href="#"><i class="fa fa-edit"></i> <span>Divisiones</span> <i
-                        class="fa fa-angle-left pull-right"></i>
-                </a>
-                <ul class="treeview-menu">
-                    <li><a href="{% url 'list-horario' %}">Horario</a></li>
-                    <li><a href="{% url 'list-maestro' %}">Maestro</a></li>
-
-
-
-                </ul>
-            </li>
-            <li class="treeview">
-                <a href="#"><i class="fa fa-graduation-cap"></i> <span>Alumnos</span> <i
-                        class="fa fa-angle-left pull-right"></i>
-
-                </a>
-                <ul class="treeview-menu">
-                    <li><a href="/academica/horario/list/">Horario</a></li>
-                    <li>
+                            <li>
                     <li class="treeview">
                         <a href="/academica/alumno/list/"><i class="fa fa-pencil"></i> <span>Inscripción</span> <i
                                 class="fa fa-angle-left pull-right"></i>
@@ -86,12 +58,26 @@
 
 
                     </li>
+                            <li><a href="{% url 'list-semestre' %}">Ciclo Semestral</a></li>
+                            <li><a href="/academica/planEstudio/list/">Plan de Estudio</a></li>
+                            <li><a href="/academica/materia/list/">Materias</a></li>
+                            <li><a href="{% url 'list-aula' %}">Aulas</a></li>
+                            <li><a href="{% url 'list-carrera' %}">Carreras</a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                <a href="#"><i class="fa fa-edit"></i> <span>Divisiones</span> <i
+                        class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="{% url 'list-horario' %}">Horario</a></li>
+                    <li><a href="{% url 'list-maestro' %}">Maestro</a></li>
 
-                    <li><a href="{% url 'list-encuesta' %}">Encuesta</a></li>
-                    <li><a href="/academica/planEstudio/list/">Plan de Estudio</a></li>
+
 
                 </ul>
             </li>
+
             <li class="treeview">
                 <a href="#"><i class="fa fa-book"></i> <span>Maestro</span> <i
                         class="fa fa-angle-left pull-right"></i>
@@ -176,6 +162,26 @@
 
                 </ul>
             </li>
+                {% endif %}
+            {% endfor %}
+            {% for group in user.groups.all %}
+                {% if group.name == 'Estudiante' %}
+            <li class="treeview">
+                <a href="#"><i class="fa fa-graduation-cap"></i> <span>Alumnos</span> <i
+                        class="fa fa-angle-left pull-right"></i>
+
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="{% url 'my-califi' %}">Mis Calificaciones</a></li>
+                    <li><a href="/academica/horario/list/">Horario</a></li>
+                    <li><a href="{% url 'list-encuesta' %}">Encuesta</a></li>
+                    <li><a href="/academica/planEstudio/list/">Plan de Estudio</a></li>
+
+                </ul>
+            </li>
+                {% endif %}
+            {% endfor %}
+
 {#            <li class="treeview">#}
 {#                <a href="#"><i class="fa fa-clipboard"></i> <span>Planeación</span> <i#}
 {#                        class="fa fa-angle-left pull-right"></i>#}

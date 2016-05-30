@@ -13,7 +13,7 @@ from academica.views import PlanCreate, \
     ServicioSocialList, ServicioLiberadosList, BecaCreate, BecaList, TipoBecaCreate, TipoBecaList, EscuelaCreate, \
     EscuelaList, BibliotecaCreate, BibliotecaList, CentroComputoCreate, CentroComputoList, ContabilidadCreate, \
     ContabilidadList, BajaBiblioteca, BibliotecaUpdate, BajaCC, CCUpdate, BajaConta, ContaUpdate, CalificacionesUpdate, \
-    ServicioUpdate, AlumnoReins
+    ServicioUpdate
 
 __author__ = 'Luisk'
 
@@ -32,7 +32,6 @@ urlpatterns = patterns('',
                        # Alumno
                        url(r'alumno/add/$', AlumnoCreate.as_view(), name='alumno-add'),
                        url(r'alumno/(?P<pk>[0-9]+)/$', AlumnoUpdate.as_view(), name='alumno-update'),
-                       url(r'alumnor/(?P<pk>[0-9]+)/$', AlumnoReins.as_view(), name='alumno-reins'),
                        url(r'alumno/list/$', AlumnoList.as_view(), name='list-alumno'),
                        url(r'^alumno/re/$', ReinscripcionList.as_view(), name='alumno-re'),
                        url(r'^alumno-ajax/$', ReinscripcionList.AlumnoAjax, name='alumno-ajax'),
@@ -57,7 +56,7 @@ urlpatterns = patterns('',
                        url(r'calificacion/list/$', CalificacionList.as_view(), name='list-calificacion'),
                        url(r'califAlum/(?P<alumno_id>\d+)/$', CalificacionList.get_calificacionesbyAlumno,
                            name='califi-alumno'),
-                       url(r'myCalif/(?P<matricula_id_a>\d+)/$', CalificacionList.get_my_calificaciones, name='my-califi'),
+                       url(r'myCalif/(?P<alumno_id>\d+)/$', CalificacionList.get_my_calificaciones, name='my-califi'),
                        url(r'calificacion/update/(?P<pk>[0-9]+)/$', CalificacionesUpdate.as_view(), name='calificacion-update'),
                        # carrera
                        url(r'carrera/add/$', CarreraCreate.as_view(), name='carrera-add'),
