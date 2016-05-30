@@ -329,21 +329,21 @@ class CalificacionList(LoggedInMixin,ListView):
         context['list_alumno'] = Alumnos.objects.filter(is_active=True)
         return context
 
-    def get_calificacionesbyAlumno(self, alumno_id):
-
+    def get_calificacionesbyAlumno(request, alumno_id):
+        user = request.user
         alumnoNombre = Alumnos.objects.get(id=alumno_id)
         list = Calificaciones.objects.filter(matricula=Alumnos.objects.get(id=alumno_id).matricula)
 
         return render_to_response('academica/calificacion/calificacion_by_alumno.html',
-                                  {'listado': list, 'alumno': alumnoNombre})
+                                  {'listado': list, 'alumno': alumnoNombre,'user':user})
 
-    def get_my_calificaciones(self, alumno_id):
-
-        alumnoNombre = Alumnos.objects.get(id=alumno_id)
-        list = Calificaciones.objects.filter(matricula=Alumnos.objects.get(id=alumno_id).matricula)
-
+    def get_my_calificaciones(request):
+        user=request.user
+        no_expediente = user.no_expediente
+        alumnoNombre = Alumnos.objects.get(matricula=no_expediente)
+        list = Calificaciones.objects.filter(matricula=no_expediente)
         return render_to_response('academica/calificacion/mis_calificaciones.html',
-                                  {'listado': list, 'alumno': alumnoNombre})
+                                  {'listado': list, 'alumno': alumnoNombre, 'user':user})
 
 
 class CalificacionesUpdate(LoggedInMixin,UpdateView):

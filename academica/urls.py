@@ -56,7 +56,7 @@ urlpatterns = patterns('',
                        url(r'calificacion/list/$', CalificacionList.as_view(), name='list-calificacion'),
                        url(r'califAlum/(?P<alumno_id>\d+)/$', CalificacionList.get_calificacionesbyAlumno,
                            name='califi-alumno'),
-                       url(r'myCalif/(?P<alumno_id>\d+)/$', CalificacionList.get_my_calificaciones, name='my-califi'),
+                       url(r'myCalif/$', CalificacionList.get_my_calificaciones, name='my-califi'),
                        url(r'calificacion/update/(?P<pk>[0-9]+)/$', CalificacionesUpdate.as_view(), name='calificacion-update'),
                        # carrera
                        url(r'carrera/add/$', CarreraCreate.as_view(), name='carrera-add'),

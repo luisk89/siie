@@ -164,18 +164,23 @@
             </li>
                 {% endif %}
             {% endfor %}
+            {% for group in user.groups.all %}
+                {% if group.name == 'Estudiante' %}
             <li class="treeview">
                 <a href="#"><i class="fa fa-graduation-cap"></i> <span>Alumnos</span> <i
                         class="fa fa-angle-left pull-right"></i>
 
                 </a>
                 <ul class="treeview-menu">
+                    <li><a href="{% url 'my-califi' %}">Mis Calificaciones</a></li>
                     <li><a href="/academica/horario/list/">Horario</a></li>
                     <li><a href="{% url 'list-encuesta' %}">Encuesta</a></li>
                     <li><a href="/academica/planEstudio/list/">Plan de Estudio</a></li>
 
                 </ul>
             </li>
+                {% endif %}
+            {% endfor %}
 
 {#            <li class="treeview">#}
 {#                <a href="#"><i class="fa fa-clipboard"></i> <span>Planeación</span> <i#}
