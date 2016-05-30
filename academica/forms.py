@@ -130,7 +130,7 @@ class AlumnosForm(forms.ModelForm):
                     Fieldset('Control Escolar', HTML("""<a data-toggle="modal"
                         data-target="#modalPlan"
                         id="modal-button"><i class="fa fa-plus-circle"></i></a>"""), 'plan', 'semestre',
-                             'no_expediente',
+                             'no_expediente','matricula',
                              'condicionado', HTML("""<a data-toggle="modal"
                         data-target="#modalGrupo"
                         id="modal-button"><i class="fa fa-plus-circle"></i></a>"""),
