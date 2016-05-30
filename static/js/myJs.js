@@ -59,7 +59,7 @@ $(document).ready(
             formAjaxSubmit('.modal-body form', '#myModal');
             //})
         })
-        $('#id_semestre').val($('#semestreHidden').val())
+        //$('#id_semestre').val($('#semestreHidden').val())
 
         $('#id_seguro').attr('onchange',"javascript:showContent()")
 

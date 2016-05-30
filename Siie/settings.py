@@ -139,7 +139,7 @@ AUTH_USER_MODEL = 'users.User'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'Siie',
+        'NAME': 'SiieTest',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'localhost',

@@ -113,7 +113,7 @@ class Alumnos(models.Model):
     generacion = models.IntegerField(blank=True, null=True)
     tipo = models.CharField(max_length=50, blank=True)
     plan = models.ForeignKey('PlanEstudio')
-    no_expediente = models.CharField(max_length=50, unique=True)
+    no_expediente = models.CharField(max_length=50, unique=True,blank=True,null=True)
     matricula = models.CharField(max_length=20, blank=True, null=True,unique=True)
     semestre = models.ForeignKey('CicloSemestral')
     condicionado = models.SmallIntegerField(blank=True, null=True)

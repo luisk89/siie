@@ -72,8 +72,30 @@ class AlumnoUpdate(LoggedInMixin,UpdateView):
     template_name = 'academica/alumnos/alumnos_form.html'
     form_class = AlumnosForm
 
+
     def get_context_data(self, **kwargs):
         context = super(AlumnoUpdate, self).get_context_data(**kwargs)
+        context['form_extra'] = ExtraCurricularesForm
+        context['form_plan'] = PlanEstudioForm
+        context['form_grupo'] = GrupoForm
+        context['form_escuela'] = EscuelaForm
+
+        return context
+
+class AlumnoReins(LoggedInMixin,UpdateView):
+    model = Alumnos
+    fields = '__all__'
+    template_name = 'academica/alumnos/alumnos_form.html'
+    form_class = AlumnosForm
+
+    def form_valid(self, form):
+        a=Alumnos.objects.filter(id=self.request.POST['alumno']).update(is_active=True).get()
+        a.sa
+
+        return super(AlumnoReins, self).form_valid(self,form)
+
+    def get_context_data(self, **kwargs):
+        context = super(AlumnoReins, self).get_context_data(**kwargs)
         context['form_extra'] = ExtraCurricularesForm
         context['form_plan'] = PlanEstudioForm
         context['form_grupo'] = GrupoForm
@@ -448,6 +470,7 @@ class BajaCreate(LoggedInMixin,CreateView):
         context['alumnos_list'] = Alumnos.objects.all()
         context['form'] = BajasForm
         return context
+
 
     def post(self, request, *args, **kwargs):
         # poniendo inactivo el alumno de baja

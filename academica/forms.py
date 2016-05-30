@@ -321,18 +321,9 @@ class BajasForm(forms.ModelForm):
     class Meta:
         model = Bajas
         fields = '__all__'
+        exclude = ("baja_date_created","is_active")
 
     motivo = forms.ChoiceField(choices=MOTIVO_BAJA, widget=forms.Select(), initial='Voluntaria')
-
-    def __init__(self, *args, **kwargs):
-        super(BajasForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_class = 'box'
-        self.helper.label_class = 'form-group'
-        self.helper.add_input(Submit('submit', 'Aceptar', css_class="btn btn-success"))
-        self.helper.layout = Layout(
-            Fieldset('alumno', 'motivo')
-        )
 
 
 class BibliotecaForm(forms.ModelForm):
@@ -577,7 +568,6 @@ class ServicioSocialForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_class = 'box'
         self.helper.label_class = 'form-group'
-        self.helper.add_input(Submit('submit', 'Guardar', css_class='btn btn-primary'))
         self.helper.layout = Layout(
             'alumno', 'proyecto', 'horas', 'is_active'
         )
