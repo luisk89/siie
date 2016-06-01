@@ -38,7 +38,7 @@
                     </thead>
 
                     <tbody id="id_table-body">
-                    {% for alumno in object_list %}
+                    {% for alumno in alumno_list %}
                         {% if not alumno.is_active %}
                         <tr>
                             <td>{{ alumno.id }}</td>

@@ -772,6 +772,9 @@ class ServicioEstadia(models.Model):
     baja_date_created = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
+    def __str__(self):
+        return self.nombre
+
 
 class ServicioHoras(models.Model):
     alumno = models.ForeignKey('Alumnos',unique=True)

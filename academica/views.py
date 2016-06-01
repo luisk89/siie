@@ -90,14 +90,15 @@ class AlumnoUpdate(LoggedInMixin,UpdateView):
 class AlumnoReins(LoggedInMixin,UpdateView):
     model = Alumnos
     fields = '__all__'
-    template_name = 'academica/alumnos/alumnos_form.html'
+    template_name = 'academica/alumnos/alumnos_re_form.html'
     form_class = AlumnosForm
 
-    def form_valid(self, form):
-        a=Alumnos.objects.filter(id=self.request.POST['alumno']).update(is_active=True).get()
-        a.sa
+    def post(self, request, *args, **kwargs):
+        # poniendo acivo al alumno de baja
+        Alumnos.objects.filter(id=request.POST['matricula']).update(is_active=True)
 
-        return super(AlumnoReins, self).form_valid(self,form)
+
+        return super(AlumnoReins, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(AlumnoReins, self).get_context_data(**kwargs)
@@ -146,7 +147,7 @@ class ReinscripcionList(LoggedInMixin,ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super(ReinscripcionList, self).get_context_data(**kwargs)
-
+        ctx['alumno_list']=Alumnos.objects.all()
         ctx['search_form'] = ConsultaAlumnosListForm
         return ctx
 

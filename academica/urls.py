@@ -13,7 +13,7 @@ from academica.views import PlanCreate, \
     ServicioSocialList, ServicioLiberadosList, BecaCreate, BecaList, TipoBecaCreate, TipoBecaList, EscuelaCreate, \
     EscuelaList, BibliotecaCreate, BibliotecaList, CentroComputoCreate, CentroComputoList, ContabilidadCreate, \
     ContabilidadList, BajaBiblioteca, BibliotecaUpdate, BajaCC, CCUpdate, BajaConta, ContaUpdate, CalificacionesUpdate, \
-    ServicioUpdate
+    ServicioUpdate, AlumnoReins
 
 __author__ = 'Luisk'
 
@@ -32,6 +32,7 @@ urlpatterns = patterns('',
                        # Alumno
                        url(r'alumno/add/$', AlumnoCreate.as_view(), name='alumno-add'),
                        url(r'alumno/(?P<pk>[0-9]+)/$', AlumnoUpdate.as_view(), name='alumno-update'),
+                       url(r'alumnore/(?P<pk>[0-9]+)/$', AlumnoReins.as_view(), name='alumnore-update'),
                        url(r'alumno/list/$', AlumnoList.as_view(), name='list-alumno'),
                        url(r'^alumno/re/$', ReinscripcionList.as_view(), name='alumno-re'),
                        url(r'^alumno-ajax/$', ReinscripcionList.AlumnoAjax, name='alumno-ajax'),
