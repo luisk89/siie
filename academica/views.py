@@ -93,12 +93,12 @@ class AlumnoReins(LoggedInMixin,UpdateView):
     template_name = 'academica/alumnos/alumnos_re_form.html'
     form_class = AlumnosForm
 
-    def post(self, request, *args, **kwargs):
-        # poniendo acivo al alumno de baja
-        Alumnos.objects.filter(id=request.POST['matricula']).update(is_active=True)
-
-
-        return super(AlumnoReins, self).post(request, *args, **kwargs)
+    # def post(self, request, *args, **kwargs):
+    #     # poniendo acivo al alumno de baja
+    #     Alumnos.objects.filter(id=request.POST['matricula']).update(is_active=True)
+    #
+    #
+    #     return super(AlumnoReins, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(AlumnoReins, self).get_context_data(**kwargs)

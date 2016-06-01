@@ -152,8 +152,8 @@ class Alumnos(models.Model):
     oratoria = models.BooleanField(default=False)
     otro_interes = models.BooleanField(default=False,verbose_name='otros')
     credencial = models.SmallIntegerField(blank=True, null=True)
-    foto = models.ImageField(upload_to='fotos')
-    firma = models.ImageField(upload_to='firma')
+    foto = models.ImageField(upload_to='fotos',blank=True)
+    firma = models.ImageField(upload_to='firma',blank=True)
 
     escuela_procedencia = models.ForeignKey('Escuela',blank=True, null=True, verbose_name='Escuela')
     anio_egreso=models.CharField(max_length=5,blank=True, null=True,verbose_name='Egreso')
