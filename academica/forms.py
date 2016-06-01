@@ -50,7 +50,7 @@ Servicio_medico = (
 Condicionado_select = (
     ('1', 'Normal'),
     ('2', 'Revalidacion'),
-    ('3', 'Reingreso')
+    ('3', 'Equivalencia')
 )
 Sangre_select = (
     ('A+', 'A+'),
@@ -77,16 +77,17 @@ class AlumnosForm(forms.ModelForm):
         fields = '__all__'
 
     sexo = forms.ChoiceField(choices=GENERO_SELECT,
-                             widget=forms.Select(), required=False)
+                             widget=forms.Select(), required=False, label='Genero')
     edo_civil = forms.ChoiceField(choices=Estado_Civil,
                                   widget=forms.Select(), required=False, label='Estado Civil')
     servicio_medico = forms.ChoiceField(choices=Servicio_medico,
                                         widget=forms.Select(), required=False)
     condicionado = forms.ChoiceField(choices=Condicionado_select,
-                                     widget=forms.Select(), required=False)
+                                     widget=forms.Select(), required=False, initial='Normal', label='Status')
 
     tipo_sangre = forms.ChoiceField(choices=Sangre_select,
                                     widget=forms.Select(), required=False)
+    edad = forms.CharField()
 
     fecha_nacimiento = widget_date
 
@@ -115,8 +116,7 @@ class AlumnosForm(forms.ModelForm):
                     'fecha_nacimiento',
                     'edo_civil',
                     Fieldset('Datos medicos', 'tipo_sangre', 'alergias', 'enfermedades', HTML("""<div id="div_id_seguro" class="checkbox"> <label for="id_seguro" class=""> <input checked="checked" class="checkboxinput" id="id_seguro" name="seguro" type="checkbox" value="1" onchange="javascript:showContent()">
-                    Seguro</label> </div>"""), Div('num_afiliacion', 'servicio_medico', id='div_ServicioMedico'),
-                             'generacion', 'tipo', 'instituto'),
+                    Servicio Medico</label> </div>"""), Div('num_afiliacion', 'servicio_medico', id='div_ServicioMedico')),
                     Fieldset('Domicilio', 'colonia', 'localidad', 'municipio', 'domicilio', 'telefono', 'cp', 'email',
                              id='domicilio')
                 ),
@@ -129,11 +129,12 @@ class AlumnosForm(forms.ModelForm):
                              'anio_egreso', 'promedio_bachiller'),
                     Fieldset('Control Escolar', HTML("""<a data-toggle="modal"
                         data-target="#modalPlan"
-                        id="modal-button"><i class="fa fa-plus-circle"></i></a>"""), 'plan', 'semestre','matricula',
-                             'condicionado', HTML("""<a data-toggle="modal"
-                        data-target="#modalGrupo"
-                        id="modal-button"><i class="fa fa-plus-circle"></i></a>"""),
-                             'grupo', 'is_active'),
+                        id="modal-button"><i class="fa fa-plus-circle"></i></a>"""), 'plan', 'semestre', 'matricula',
+                             'condicionado'),
+                    # HTML("""<a data-toggle="modal"
+                    #     data-target="#modalGrupo"
+                    #     id="modal-button"><i class="fa fa-plus-circle"></i></a>"""),
+                    #          'grupo', 'is_active'
                     css_class="nav nav-tabs"
                 ),
                 Tab(
@@ -321,7 +322,7 @@ class BajasForm(forms.ModelForm):
     class Meta:
         model = Bajas
         fields = '__all__'
-        exclude = ("baja_date_created","is_active")
+        exclude = ("baja_date_created", "is_active")
 
     motivo = forms.ChoiceField(choices=MOTIVO_BAJA, widget=forms.Select(), initial='Voluntaria')
 
@@ -389,8 +390,10 @@ class EvaluacionForm(forms.ModelForm):
         model = Evaluacion
         fields = '__all__'
 
+
 widget_text_area = forms.CharField(max_length=250, widget=forms.Textarea(
     attrs={'rows': '4', 'cols': '30', 'class': 'form-control'}))
+
 
 class EncuestaForm(forms.ModelForm):
     class Meta:
@@ -401,7 +404,7 @@ class EncuestaForm(forms.ModelForm):
                              widget=forms.Select(), required=False)
 
     estado_civil = forms.ChoiceField(choices=Estado_Civil,
-                                  widget=forms.Select(), required=False, label='Estado Civil')
+                                     widget=forms.Select(), required=False, label='Estado Civil')
     comentarios = widget_text_area
 
     def __init__(self, *args, **kwargs):
@@ -467,7 +470,6 @@ class EncuestaForm(forms.ModelForm):
                 Tab('Comentarios Finales', 'comentarios')
             )
         )
-
 
 
 class MunicipioForm(forms.ModelForm):
