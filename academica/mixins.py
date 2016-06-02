@@ -34,3 +34,4 @@ def getEstudiantesPuedenSS():
 
 def getAlumnos():
     return Alumnos.objects.all()
+

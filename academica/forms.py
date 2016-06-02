@@ -88,8 +88,12 @@ class AlumnosForm(forms.ModelForm):
     tipo_sangre = forms.ChoiceField(choices=Sangre_select,
                                     widget=forms.Select(), required=False)
     edad = forms.CharField()
+    promedio_bachiller=forms.CharField(label='Promedio')
+    curp=forms.CharField(max_length=18,required=False)
+    #semestre = forms.ChoiceField(choices=mixins.getCicloSemestral(),widget=forms.Select(attrs={'class': 'form-control'}), required=False,initial=mixins.getSemestreActive())
 
     fecha_nacimiento = widget_date
+
 
     def __init__(self, *args, **kwargs):
         super(AlumnosForm, self).__init__(*args, **kwargs)
@@ -313,7 +317,8 @@ class CicloSemestralForm(forms.ModelForm):
 
 MOTIVO_BAJA = (
     ('Voluntaria', 'Voluntaria'),
-    ('Academica', 'Academica'),
+    ('Reprobación','Reprobación'),
+    ('Repetición','Repetición')
 
 )
 
