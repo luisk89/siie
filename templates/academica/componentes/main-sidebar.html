@@ -173,6 +173,51 @@
             </li>
                 {% endif %}
             {% endfor %}
+            {% for group in user.groups.all %}
+                {% if group.name == 'Biblioteca' %}
+                    <li class="treeview">
+                <a href="#"><i class="fa fa-bookmark"></i> <span>Biblioteca</span> <i
+                        class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="{% url 'list-biblio' %}">Alta</a></li>
+                    <li><a href="{% url 'baja-biblio' %}">Baja</a></li>
+                </ul>
+            </li>
+
+            {% endif %}
+            {% endfor %}
+            {% for group in user.groups.all %}
+                {% if group.name == 'Contabilidad' %}
+                <li class="treeview">
+                    <a href="#"><i class="fa fa-money"></i> <span>Contabilidad</span> <i
+                            class="fa fa-angle-left pull-right"></i>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li><a href="{% url 'list-conta' %}">Alta</a></li>
+                        <li><a href="{% url 'baja-cont' %}">Baja</a></li>
+
+                    </ul>
+                </li>
+
+            {% endif %}
+            {% endfor %}
+            {% for group in user.groups.all %}
+                {% if group.name == 'Centro Computo' %}
+                <li class="treeview">
+                <a href="#"><i class="fa fa-laptop"></i> <span>Centro de Computo</span> <i
+                        class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="{% url 'list-cc' %}">Alta</a></li>
+                    <li><a href="{% url 'baja-cc' %}">Baja</a></li>
+
+                </ul>
+                </li>
+
+            {% endif %}
+            {% endfor %}
+
 
 {#            <li class="treeview">#}
 {#                <a href="#"><i class="fa fa-clipboard"></i> <span>Planeación</span> <i#}
