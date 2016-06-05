@@ -13,6 +13,8 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, Button, Div, HTML
 from crispy_forms.bootstrap import TabHolder, Tab, InlineField, InlineCheckboxes
 
+
+
 from academica.models import Alumnos, PlanEstudio, Extracurriculares, Grupos, Horario, Materias, Maestros, \
     Carreras, CicloSemestral, Bajas, Evaluacion, EncuestaEgresados, Aulas, Municipios, \
     Estados, Calificaciones, ServicioHoras, Becas, TipoBeca, Escuela, Biblioteca, Contabilidad, CentroComputo
@@ -66,15 +68,17 @@ Sangre_select = (
 hoy = datetime.datetime.now()
 hoy = hoy.strftime('%Y-%m-%d')
 
-widget_date = forms.DateField(required=False, input_formats=['%d/%m/%Y', '%m/%d/%Y'],
-                              widget=forms.DateInput(format='%d/%m/%Y', attrs={'placeholder': 'dd/mm/aaaa',
-                                                                               'class': 'datepicker ui-widget ui-widget-content date-field'}))
 
 
 class AlumnosForm(forms.ModelForm):
     class Meta:
         model = Alumnos
         fields = '__all__'
+        widgets = {
+            'fecha_nacimiento': forms.DateInput(attrs={'placeholder': 'dd/mm/aaaa','class': 'datepicker ui-widget ui-widget-content date-field'}),
+        }
+
+
 
     sexo = forms.ChoiceField(choices=GENERO_SELECT,
                              widget=forms.Select(), required=False, label='Genero')
@@ -92,7 +96,8 @@ class AlumnosForm(forms.ModelForm):
     curp=forms.CharField(max_length=18,required=False)
     #semestre = forms.ChoiceField(choices=mixins.getCicloSemestral(),widget=forms.Select(attrs={'class': 'form-control'}), required=False,initial=mixins.getSemestreActive())
 
-    fecha_nacimiento = widget_date
+
+
 
 
     def __init__(self, *args, **kwargs):
@@ -104,6 +109,7 @@ class AlumnosForm(forms.ModelForm):
         self.helper.form_class = 'box'
         self.helper.label_class = 'form-group'
         self.helper.add_input(Submit('submit', 'Guardar'))
+
 
         self.helper.layout = Layout(
             TabHolder(
@@ -300,6 +306,16 @@ class CicloSemestralForm(forms.ModelForm):
     class Meta:
         model = CicloSemestral
         fields = '__all__'
+        widgets = {
+            'fecha_inicio': forms.DateInput(
+                attrs={'placeholder': 'dd/mm/aaaa', 'class': 'datepicker ui-widget ui-widget-content date-field'}),
+            'fecha_termino': forms.DateInput(
+                attrs={'placeholder': 'dd/mm/aaaa', 'class': 'datepicker ui-widget ui-widget-content date-field'}),
+            'fecha_inicio_programacion': forms.DateInput(
+                attrs={'placeholder': 'dd/mm/aaaa', 'class': 'datepicker ui-widget ui-widget-content date-field'}),
+            'fecha_fin_programacion': forms.DateInput(
+                attrs={'placeholder': 'dd/mm/aaaa', 'class': 'datepicker ui-widget ui-widget-content date-field'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super(CicloSemestralForm, self).__init__(*args, **kwargs)
