@@ -67,7 +67,7 @@ Sangre_select = (
 )
 hoy = datetime.datetime.now()
 hoy = hoy.strftime('%Y-%m-%d')
-
+style_numeric = 'ui-widget ui-widget-content numeric-field'
 
 
 class AlumnosForm(forms.ModelForm):
@@ -91,8 +91,8 @@ class AlumnosForm(forms.ModelForm):
 
     tipo_sangre = forms.ChoiceField(choices=Sangre_select,
                                     widget=forms.Select(), required=False)
-    edad = forms.CharField()
-    promedio_bachiller=forms.CharField(label='Promedio')
+    edad = forms.IntegerField(required=False)
+    promedio_bachiller=forms.FloatField(label='Promedio', initial=0.0, widget=forms.TextInput(attrs={'class':style_numeric}), required=False)
     curp=forms.CharField(max_length=18,required=False)
     #semestre = forms.ChoiceField(choices=mixins.getCicloSemestral(),widget=forms.Select(attrs={'class': 'form-control'}), required=False,initial=mixins.getSemestreActive())
 
@@ -189,6 +189,123 @@ class AlumnosForm(forms.ModelForm):
 # if fecha_nacimiento is not None:
 #            if fecha_actual < fecha_nacimiento:
 #                raise forms.ValidationError("El fecha no debe ser mayor a la fecha actual")
+
+class ReinscripcionAlumnoForm(forms.ModelForm):
+    class Meta:
+        model = Alumnos
+        fields = '__all__'
+        widgets = {
+            'fecha_nacimiento': forms.DateInput(attrs={'placeholder': 'dd/mm/aaaa','class': 'datepicker ui-widget ui-widget-content date-field'}),
+        }
+
+
+
+    sexo = forms.ChoiceField(choices=GENERO_SELECT,
+                             widget=forms.Select(), required=False, label='Genero')
+    edo_civil = forms.ChoiceField(choices=Estado_Civil,
+                                  widget=forms.Select(), required=False, label='Estado Civil')
+    servicio_medico = forms.ChoiceField(choices=Servicio_medico,
+                                        widget=forms.Select(), required=False)
+    condicionado = forms.ChoiceField(choices=Condicionado_select,
+                                     widget=forms.Select(), required=False, initial='Normal', label='Status')
+
+    tipo_sangre = forms.ChoiceField(choices=Sangre_select,
+                                    widget=forms.Select(), required=False)
+    edad = forms.IntegerField(required=False)
+    promedio_bachiller=forms.FloatField(label='Promedio', initial=0.0, widget=forms.TextInput(attrs={'class':style_numeric}), required=False)
+
+
+
+    curp=forms.CharField(max_length=18,required=False)
+
+
+
+
+    def __init__(self, *args, **kwargs):
+        super(ReinscripcionAlumnoForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.fields['edad'].widget.attrs['min'] = 1
+        self.fields['sueldo_mensual'].widget.attrs['min'] = 0
+        self.fields['sueldo_mensual_alumno'].widget.attrs['min'] = 0
+        self.fields['is_active'].widget = forms.HiddenInput()
+        self.fields['matricula'].widget.attrs['onfocus']="javascript:test()"
+
+        self.helper.form_class = 'box'
+        self.helper.label_class = 'form-group'
+        self.helper.add_input(Submit('submit', 'Guardar'))
+
+
+        self.helper.layout = Layout(
+            TabHolder(
+                Tab(
+                    'Datos Personales',
+                    'is_active',
+                    'nom_alumno',
+                    'apellido_paterno',
+                    'apellido_materno',
+                    Fieldset('Credencial', 'foto', 'firma', id='img'),
+                    'curp',
+                    'sexo',
+                    'edad',
+                    'lugar_nac',
+                    'fecha_nacimiento',
+                    'edo_civil',
+                    Fieldset('Datos medicos', 'tipo_sangre', 'alergias', 'enfermedades', HTML("""<div id="div_id_seguro" class="checkbox"> <label for="id_seguro" class=""> <input checked="checked" class="checkboxinput" id="id_seguro" name="seguro" type="checkbox" value="1" onchange="javascript:showContent()">
+                    Servicio Medico</label> </div>"""), Div('num_afiliacion', 'servicio_medico', id='div_ServicioMedico')),
+                    Fieldset('Domicilio', 'colonia', 'localidad', 'municipio', 'domicilio', 'telefono', 'cp', 'email',
+                             id='domicilio')
+                ),
+
+                Tab(
+                    'Datos Escolares',
+                    Fieldset('Procedencia', HTML("""<a data-toggle="modal"
+                        data-target="#modalEscuela"
+                        id="modal-button"><i class="fa fa-plus-circle"></i></a>"""), 'escuela_procedencia',
+                             'anio_egreso', 'promedio_bachiller'),
+                    Fieldset('Control Escolar', HTML("""<a data-toggle="modal"
+                        data-target="#modalPlan"
+                        id="modal-button"><i class="fa fa-plus-circle"></i></a>"""), 'plan', 'semestre', 'matricula',
+                             'condicionado'),
+
+                    css_class="nav nav-tabs"
+                ),
+                Tab(
+                    'Documentacion y Datos Varios',
+                    Fieldset('En caso de emergencia avisar a:', 'contacto_emergencia', 'contacto_domicilio',
+                             'contacto_tel'),
+                    Fieldset('Datos Familiares',
+                             Fieldset('Datos del padre o tutor', 'nombre_tutor', 'domicilio_tutor', 'localidad_tutor',
+                                      'telefono_tutor', 'ocupacion_tutor', 'sueldo_mensual', HTML(
+                                     """<a class="btn btn-block btn-success" id='id_boton_copiar' onclick="javascript:datacopy()"><i class="fa fa-copy"></i>Copiar datos a la madre</a>""")),
+                             Fieldset('Datos de la madre', 'nombre_materno', 'domicilio_madre', 'localidad_madre',
+                                      'telefono_madre'),
+                             Fieldset('Datos generales', 'trabaja_actualmente',
+                                      Div('puesto', 'sueldo_mensual_alumno', id='div_trabajo_estudiante'))),
+                    Fieldset('Actividades', 'deporte_practica', 'credencial'),
+                    Div('oratoria', 'musica',
+                        'teatro', 'declamacion', 'otro_interes'),
+                    css_class="nav nav-tabs"
+                ),
+
+                css_class="nav-tabs-custom"
+            )
+
+        )
+
+    def clean(self):
+        cleaned_data = self.cleaned_data.copy()
+
+
+        fecha_nacimiento = cleaned_data.pop('fecha_nacimiento', None)
+        fecha_actual = timezone.now()
+
+    def save(self, force_insert=False, force_update=False, commit=True):
+        entity = super(ReinscripcionAlumnoForm, self).save(commit)
+        print('begin'+ entity.is_active.__str__())
+        entity.is_active = True
+        print("before"+entity.is_active.__str__())
+        entity.save()
+        return entity
 
 
 class PlanEstudioForm(forms.ModelForm):

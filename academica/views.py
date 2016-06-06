@@ -19,7 +19,8 @@ from academica.forms import AlumnosForm, PlanEstudioForm, ExtraCurricularesForm,
     CalificacionForm, CarreraForm, CicloSemestralForm, BajasForm, MateriaForm, CarreraUpdateForm, EncuestaForm, \
     ConsultaAlumnosListForm, ConsultaCicloSemestralListForm, MunicipioForm, EstadoForm, AulaForm, \
     ConsultaExtracurricularListForm, \
-    ServicioSocialForm, BecasForm, TiposBecasForm, EscuelaForm, BibliotecaForm, CentroComputoForm, ContabilidadForm
+    ServicioSocialForm, BecasForm, TiposBecasForm, EscuelaForm, BibliotecaForm, CentroComputoForm, ContabilidadForm, \
+    ReinscripcionAlumnoForm
 
 # Create your views here.
 from academica.models import Alumnos, PlanEstudio, Extracurriculares, Grupos, Horario, Maestros, Materias, \
@@ -54,7 +55,7 @@ class AlumnoCreate(LoggedInMixin,CreateView):
         avatar = form.cleaned_data['foto']
         matricula = form.cleaned_data['matricula']
 
-        # poniendo como usuario la primeraletra del nombre y el apellido->Ej. rrosabal
+        # poniendo como usuario la primeraletra del nombre y el apellido->Ej. rrosal
         usuario = username[0] + apellido_paterno
 
         # en el formulario esta la validacion para el username y el email (el user name que se crea es el nombre del alumno eso tenemos que cambiarlo, hacer una mescla nombre mas apellido o algo asi)
@@ -90,8 +91,8 @@ class AlumnoUpdate(LoggedInMixin,UpdateView):
 class AlumnoReins(LoggedInMixin,UpdateView):
     model = Alumnos
     fields = '__all__'
-    template_name = 'academica/alumnos/alumnos_form.html'
-    form_class = AlumnosForm
+    template_name = 'academica/alumnos/alumnos_re_form.html'
+    form_class = ReinscripcionAlumnoForm
 
 
     def get_context_data(self, **kwargs):
@@ -286,8 +287,18 @@ class HorarioList(LoggedInMixin,ListView):
     def get_context_data(self, **kwargs):
         context = super(HorarioList, self).get_context_data(**kwargs)
         context['form'] = HorarioForm
+
         return context
 
+    def get_my_horarios(request):
+        user=request.user
+        no_expediente = user.no_expediente
+
+        alumnoNombre = Alumnos.objects.get(matricula=no_expediente)
+        group = Grupos.objects.filter(id=alumnoNombre.grupo.id)
+        horarios=group.horario_set.all()
+        print(horarios)
+        return render_to_response('academica/horario/mis_horarios.html')
 
 class MateriaCreate(LoggedInMixin,CreateView):
     model = Materias

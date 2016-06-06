@@ -48,6 +48,7 @@ urlpatterns = patterns('',
                        # horario
                        url(r'horario/add/$', HorarioCreate.as_view(), name='horario-add'),
                        url(r'horario/list/$', HorarioList.as_view(), name='list-horario'),
+                       url(r'myhorario/$',permission_required('users.permissions_estudiante', login_url='login')(HorarioList.get_my_horarios), name='my-horarios'),
                        # materias
                        url(r'materia/add/$', MateriaCreate.as_view(), name='materia-add'),
                        url(r'materia/list/$', MateriaList.as_view(), name='list-materias'),
