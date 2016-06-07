@@ -106,6 +106,11 @@ class AlumnosForm(forms.ModelForm):
         self.fields['edad'].widget.attrs['min'] = 1
         self.fields['sueldo_mensual'].widget.attrs['min'] = 0
         self.fields['sueldo_mensual_alumno'].widget.attrs['min'] = 0
+        self.fields['matricula'].widget.attrs['onfocus']="javascript:Buscar()"
+        self.fields['plan'].widget.attrs['onchange']="javascript:Buscar()"
+        self.fields['semestre'].widget.attrs['onchange']="javascript:Buscar()"
+        self.fields['trabaja_actualmente'].widget.attrs['onchange']="javascript:showContent1()"
+
         self.helper.form_class = 'box'
         self.helper.label_class = 'form-group'
         self.helper.add_input(Submit('submit', 'Guardar'))
@@ -219,8 +224,6 @@ class ReinscripcionAlumnoForm(forms.ModelForm):
     curp=forms.CharField(max_length=18,required=False)
 
 
-
-
     def __init__(self, *args, **kwargs):
         super(ReinscripcionAlumnoForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -228,7 +231,10 @@ class ReinscripcionAlumnoForm(forms.ModelForm):
         self.fields['sueldo_mensual'].widget.attrs['min'] = 0
         self.fields['sueldo_mensual_alumno'].widget.attrs['min'] = 0
         self.fields['is_active'].widget = forms.HiddenInput()
-        self.fields['matricula'].widget.attrs['onfocus']="javascript:test()"
+        self.fields['matricula'].widget.attrs['onfocus']="javascript:Buscar()"
+        self.fields['plan'].widget.attrs['onchange']="javascript:Buscar()"
+        self.fields['semestre'].widget.attrs['onchange']="javascript:Buscar()"
+        self.fields['trabaja_actualmente'].widget.attrs['onchange']="javascript:showContent1()"
 
         self.helper.form_class = 'box'
         self.helper.label_class = 'form-group'
@@ -333,6 +339,26 @@ class GrupoForm(forms.ModelForm):
     class Meta:
         model = Grupos
         fields = '__all__'
+
+class GrupoUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Grupos
+        fields = '__all__'
+
+
+
+    def __init__(self, *args, **kwargs):
+        super(GrupoUpdateForm, self).__init__(*args, **kwargs)
+        self.fields['cant_alumnos'].widget.attrs['min'] = 0
+        self.fields['actual'].widget.attrs['min'] = 0
+        self.helper = FormHelper()
+        self.helper.form_class = 'box'
+        self.helper.label_class = 'form-group'
+        self.helper.add_input(Submit('submit', 'Guardar'))
+        self.helper.layout = Layout(
+            Fieldset('General','clave','nombre','cant_alumnos','semestre','carrera','actual','ciclo_escolar','plan','materias','horario'
+            )
+        )
 
 
 class HorarioForm(forms.ModelForm):

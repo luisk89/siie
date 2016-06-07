@@ -550,6 +550,7 @@ class Grupos(models.Model):
 
     # nuevos campos
     horario = models.ForeignKey("Horario", blank=True, null=True)
+    #horarios = models.ManyToManyField("Horario", blank=True, null=True)
 
     alta_date_created = models.DateTimeField(auto_now_add=True)
     baja_date_created = models.DateTimeField(blank=True, null=True)

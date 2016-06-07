@@ -59,11 +59,6 @@ $(document).ready(
             formAjaxSubmit('.modal-body form', '#myModal');
             //})
         })
-        //$('#id_semestre').val($('#semestreHidden').val())
-
-        $('#id_seguro').attr('onchange',"javascript:showContent()")
-
-        $('#id_trabaja_actualmente').attr('onchange',"javascript:showContent1()")
 
 
         $('#buscar_alumno').on('click', Buscar);
@@ -151,6 +146,31 @@ $(document).ready(
         //end document ready
     }
 );
+
+        function Buscar() {
+            var anio=document.getElementById('id_semestre').selectedOptions[0].innerHTML.split('-')[0]
+            var plan = $('#id_plan').val()
+            console.log(anio)
+
+          $.ajax({
+                data: {
+                    'anio': anio,
+                    'plan': plan,
+
+                },
+                url: '/academica/buscarexp-ajax/',
+                type: 'get',
+                success: function (data) {
+                    var objeto = JSON.parse(data)
+                    console.log(objeto)
+                    $('#id_matricula').attr('value',objeto)
+
+                }
+
+            })
+
+
+        }
 
 function cargarPlan() {
     Dajaxice.academica.cargar_plan(Dajax.process);

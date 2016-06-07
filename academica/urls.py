@@ -38,6 +38,7 @@ urlpatterns = patterns('',
                        url(r'alumno/list/$', AlumnoList.as_view(), name='list-alumno'),
                        url(r'^alumno/re/$', ReinscripcionList.as_view(), name='alumno-re'),
                        url(r'^alumno-ajax/$', ReinscripcionList.AlumnoAjax, name='alumno-ajax'),
+                       url(r'^buscarexp-ajax/$', AlumnoCreate.buscar_exp_ajax, name='buscarexp-ajax'),
                        # Extracurriculares
                        url(r'alumno/add/addExtracurricular/$', ExtracurricularesCreate.as_view(), name='extra-add'),
                        url(r'^extracurricular/list$', ExtracurricularList.as_view(), name='list-extra'),

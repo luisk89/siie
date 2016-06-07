@@ -20,7 +20,7 @@ from academica.forms import AlumnosForm, PlanEstudioForm, ExtraCurricularesForm,
     ConsultaAlumnosListForm, ConsultaCicloSemestralListForm, MunicipioForm, EstadoForm, AulaForm, \
     ConsultaExtracurricularListForm, \
     ServicioSocialForm, BecasForm, TiposBecasForm, EscuelaForm, BibliotecaForm, CentroComputoForm, ContabilidadForm, \
-    ReinscripcionAlumnoForm
+    ReinscripcionAlumnoForm, GrupoUpdateForm
 
 # Create your views here.
 from academica.models import Alumnos, PlanEstudio, Extracurriculares, Grupos, Horario, Maestros, Materias, \
@@ -70,6 +70,32 @@ class AlumnoCreate(LoggedInMixin,CreateView):
         messages.success(self.request, 'Usuario:  '+ usuario + '  Password:  '+ usuario )
 
         return super(AlumnoCreate, self).form_valid(form)
+
+    def buscar_exp_ajax(request):
+        if request.is_ajax():
+            # alumnosReturn=Alumnos.objects.filter(Q(nom_alumno__contains=request.GET['nombre']) | Q(apellido_paterno__contains=request.GET['apellidoP'])| Q(apellido_materno__contains=request.GET['apellidoM'])|Q(semestre__id__contains=request.GET['semestre'])|Q(no_expediente__contains=request.GET['expediente'])).all()
+            print(request.GET['anio'])
+            print(request.GET['plan'])
+
+            if request.GET['plan'] and Grupos.objects.filter(plan_id=request.GET['plan']).exists():
+                carrera=Grupos.objects.filter(plan_id=request.GET['plan']).get().carrera.abreviatura
+            else:
+                carrera="CCC"
+
+
+            if request.GET['anio'] :
+                anio=request.GET['anio']
+            else:
+                anio="AAAA"
+
+
+            consect=Alumnos.objects.all().count()+1
+
+            retorno=(anio+"-"+carrera+"-"+consect.__str__())
+
+            return HttpResponse(json.dumps(retorno))
+        else:
+            return redirect('/')
 
 
 class AlumnoUpdate(LoggedInMixin,UpdateView):
@@ -257,12 +283,12 @@ class GruposList(LoggedInMixin,ListView):
 class GrupoUpdate(LoggedInMixin,UpdateView):
     model = Grupos
     fields = '__all__'
-    template_name = 'academica/grupo/grupo_form.html'
-    form_class = GrupoForm
+    template_name = 'academica/grupo/grupo_update_form.html'
+    form_class = GrupoUpdateForm
 
     def get_context_data(self, **kwargs):
         context = super(GrupoUpdate, self).get_context_data(**kwargs)
-        context['form_grupo'] = GrupoForm
+        context['form_grupoupdate'] = GrupoUpdateForm
         return context
 
 
