@@ -24,6 +24,7 @@ urlpatterns = patterns('',
                        url(r'^grappelli/', include('grappelli.urls')),
                        url(r'^markdown/', include("django_markdown.urls")),
                        url(r'^', include('users.urls', namespace='users')),
+                       url(r'^', include('reportes.urls', namespace='reportes')),
                        #url(r'^%s/' % settings.DAJAXICE_MEDIA_PREFIX, include('dajaxice.urls'))
 
                        )

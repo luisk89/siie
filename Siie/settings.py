@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'academica',
     'dajaxice',
     'dajax',
+    'wkhtmltopdf',
 
 )
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -139,7 +140,7 @@ AUTH_USER_MODEL = 'users.User'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'Siie1',
+        'NAME': 'Siie',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
@@ -175,8 +176,6 @@ TEMPLATE_DIRS = (os.path.join(BASE_DIR, "templates"),)
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
-
-
 
 
 if APP_MODE == 'dev':
