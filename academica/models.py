@@ -112,8 +112,8 @@ class Alumnos(models.Model):
     num_afiliacion = models.CharField(max_length=50, blank=True, verbose_name='No De Afiliación')
     generacion = models.IntegerField(blank=True, null=True)
     tipo = models.CharField(max_length=50, blank=True)
-    plan = models.ForeignKey('PlanEstudio')
-    no_expediente = models.CharField(max_length=50, unique=True, blank=True)
+    plan = models.ForeignKey('PlanEstudio',to_field='clave_plan',null=True)
+    no_expediente = models.CharField(max_length=50,blank=True)
     matricula = models.CharField(max_length=20, blank=True, null=True,unique=True)
     semestre = models.ForeignKey('CicloSemestral')
     condicionado = models.SmallIntegerField(blank=True, null=True,verbose_name='Status')
@@ -140,7 +140,7 @@ class Alumnos(models.Model):
     domicilio_madre = models.CharField(max_length=100, blank=True)
     localidad_madre = models.CharField(max_length=50, blank=True)
     telefono_madre = models.CharField(max_length=50, blank=True)
-    trabaja_actualmente = models.BooleanField(default=False)
+    trabaja_actualmente = models.BooleanField(default=False,blank=True)
     puesto = models.CharField(max_length=50, blank=True)
     sueldo_mensual_alumno = models.DecimalField(max_digits=19, decimal_places=4, blank=True, null=True)
     transporte = models.SmallIntegerField(blank=True, null=True)
@@ -165,8 +165,7 @@ class Alumnos(models.Model):
     is_deuda = models.BooleanField(default=False)
     # carreras = models.ManyToManyField("Carreras", blank=True, null=True)
     # nuevos campos
-    grupo = models.ForeignKey('Grupos', blank=True, null=True)
-
+    #grupo = models.ForeignKey('Grupos', blank=True, null=True)
     alta_date_created = models.DateTimeField(auto_now_add=True)
     baja_date_created = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
@@ -549,8 +548,8 @@ class Grupos(models.Model):
     # maestros = models.ManyToManyField("Maestros", blank=True, null=True)
 
     # nuevos campos
-    horario = models.ForeignKey("Horario", blank=True, null=True)
-    #horarios = models.ManyToManyField("Horario", blank=True, null=True)
+    #horario = models.ForeignKey("Horario", blank=True, null=True)
+    horarios = models.ManyToManyField("Horario", blank=True, null=True)
 
     alta_date_created = models.DateTimeField(auto_now_add=True)
     baja_date_created = models.DateTimeField(blank=True, null=True)
@@ -904,7 +903,7 @@ class Evaluacion(models.Model):
 
 
 class CicloSemestral(models.Model):
-    clave = models.CharField(max_length=50, blank=True)
+    clave = models.CharField(max_length=50,blank=True,unique=True)
     ciclo_sep = models.CharField(max_length=50, blank=True, verbose_name='Ciclo SEP')
     anio = models.IntegerField(blank=True, null=True, verbose_name="Año")
     periodo = models.IntegerField(blank=True, null=True)
@@ -989,11 +988,12 @@ class Escuela(models.Model):
         return self.nombre
 
 class Calificaciones(models.Model):
-    #alumno = models.ForeignKey(Alumnos, db_index=True)
-    semestre = models.ForeignKey(CicloSemestral)
-    plan = models.ForeignKey(PlanEstudio)
-    materia = models.ForeignKey(Materias,to_field='clave')
-    matricula = models.ForeignKey(Alumnos,to_field='matricula')
+
+    materia = models.ForeignKey(Materias,to_field='clave',null=True)
+    matricula = models.ForeignKey(Alumnos,to_field='matricula',null=True)
+    semestre = models.ForeignKey(CicloSemestral,to_field='clave',null=True)
+    plan = models.ForeignKey(PlanEstudio,to_field='clave_plan',null=True)
+
 
     calif1 = models.DecimalField(max_digits=5, decimal_places=2, blank=True, verbose_name='Calificacion', null=True, )
     status1 = models.IntegerField(blank=True, null=True, verbose_name='Status')
@@ -1019,7 +1019,7 @@ class Calificaciones(models.Model):
     id_curso = models.IntegerField(blank=True, null=True, )
     fecha_extraordinario = models.DateTimeField(blank=True, null=True, )
 
-    alta_date_created = models.DateTimeField(auto_now_add=True)
+    alta_date_created = models.DateTimeField(auto_now_add=True,blank=True, null=True)
     baja_date_created = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
 

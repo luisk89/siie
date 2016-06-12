@@ -12,13 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RemoveField(
-            model_name='grupos',
-            name='horarios',
-        ),
-        migrations.AddField(
-            model_name='grupos',
-            name='horario',
-            field=models.ForeignKey(null=True, blank=True, to='academica.Horario'),
-            preserve_default=True,
+            model_name='alumnocalificacion',
+            name='revalidacion',
         ),
     ]

@@ -97,9 +97,6 @@ class AlumnosForm(forms.ModelForm):
     #semestre = forms.ChoiceField(choices=mixins.getCicloSemestral(),widget=forms.Select(attrs={'class': 'form-control'}), required=False,initial=mixins.getSemestreActive())
 
 
-
-
-
     def __init__(self, *args, **kwargs):
         super(AlumnosForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -330,15 +327,24 @@ class PlanEstudioForm(forms.ModelForm):
 
 
 class GrupoForm(forms.ModelForm):
-    helper = FormHelper()
-    helper.add_input(Submit('submit', 'Guardar'))
-    helper.layout = Layout(
-        'clave', 'nombre', 'cant_alumnos', 'semestre', 'carrera', 'actual', 'ciclo_escolar',
-        'horario', 'plan', 'materias')
-
     class Meta:
         model = Grupos
         fields = '__all__'
+
+
+    def __init__(self, *args, **kwargs):
+        super(GrupoForm, self).__init__(*args, **kwargs)
+        self.fields['cant_alumnos'].widget.attrs['min'] = 0
+        self.fields['actual'].widget.attrs['min'] = 0
+        self.helper = FormHelper()
+        self.helper.form_class = 'box'
+        self.helper.label_class = 'form-group'
+        self.helper.add_input(Submit('submit', 'Guardar'))
+        self.helper.layout = Layout(
+            Fieldset('General','clave', 'nombre', 'cant_alumnos', 'semestre', 'carrera', 'actual', 'ciclo_escolar','horarios', 'plan', 'materias')
+        )
+
+
 
 class GrupoUpdateForm(forms.ModelForm):
     class Meta:
@@ -356,7 +362,7 @@ class GrupoUpdateForm(forms.ModelForm):
         self.helper.label_class = 'form-group'
         self.helper.add_input(Submit('submit', 'Guardar'))
         self.helper.layout = Layout(
-            Fieldset('General','clave','nombre','cant_alumnos','semestre','carrera','actual','ciclo_escolar','plan','materias','horario'
+            Fieldset('General','clave','nombre','cant_alumnos','semestre','carrera','actual','ciclo_escolar','plan','materias','horarios'
             )
         )
 
@@ -374,7 +380,8 @@ class HorarioForm(forms.ModelForm):
                  'minutos_termino',
                  'aula',
                  'profesores',
-                 'is_active'
+                 'is_active',
+                 'grupos'
                  )
     )
 

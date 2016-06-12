@@ -52,6 +52,7 @@ INSTALLED_APPS = (
     'dajaxice',
     'dajax',
     'wkhtmltopdf',
+    'reportes'
 
 )
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -140,7 +141,7 @@ AUTH_USER_MODEL = 'users.User'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'Siie',
+        'NAME': 'Siie1',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'localhost',

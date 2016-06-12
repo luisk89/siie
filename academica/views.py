@@ -321,9 +321,10 @@ class HorarioList(LoggedInMixin,ListView):
         no_expediente = user.no_expediente
 
         alumnoNombre = Alumnos.objects.get(matricula=no_expediente)
-        group = Grupos.objects.filter(id=alumnoNombre.grupo.id)
-        horarios=group.horario_set.all()
-        print(horarios)
+        if(Grupos.objects.filter(id=alumnoNombre.grupo.id).exists()):
+            group = Grupos.objects.filter(id=alumnoNombre.grupo.id).get()
+            horarios=group.horarios
+            print(horarios)
         return render_to_response('academica/horario/mis_horarios.html')
 
 class MateriaCreate(LoggedInMixin,CreateView):

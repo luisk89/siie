@@ -97,8 +97,8 @@ urlpatterns = patterns('',
                        url(r'estado/add/$',permission_required('users.permissions_administrador', login_url='login')(  EstadoCreate.as_view()), name='estado-add'),
                        url(r'estado/list/$',permission_required('users.permissions_administrador', login_url='login')(  EstadoList.as_view()), name='list-estado'),
 
-                       url(r'municipio/add/$',permission_required('users.permissions_administrador', login_url='login')(  MunicipioCreate.as_view()), name='municipio-add'),
-                       url(r'municipio/list/$',permission_required('users.permissions_administrador', login_url='login')(  MunicipioList.as_view()), name='list-municipio'),
+                       url(r'municipio/add/$',permission_required('users.permissions_administrador', login_url='login')(MunicipioCreate.as_view()), name='municipio-add'),
+                       url(r'municipio/list/$',permission_required('users.permissions_administrador', login_url='login')(MunicipioList.as_view()), name='list-municipio'),
 
                        url(r'aula/add/$',permission_required('users.permissions_administrador', login_url='login')(  AulaCreate.as_view()), name='aula-add'),
                        url(r'aula/list/$',permission_required('users.permissions_administrador', login_url='login')(  AulaList.as_view()), name='list-aula'),
