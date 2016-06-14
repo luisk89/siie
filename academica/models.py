@@ -539,11 +539,11 @@ class Grupos(models.Model):
     clave = models.CharField(max_length=50, blank=True)
     nombre = models.CharField(max_length=50, blank=True)
     cant_alumnos = models.IntegerField(blank=True, null=True)
-    semestre = models.ForeignKey("CicloSemestral")
+    semestre = models.ForeignKey("CicloSemestral",to_field='clave')
     carrera = models.ForeignKey('Carreras')
     actual = models.SmallIntegerField(blank=True, null=True)
     ciclo_escolar = models.CharField(max_length=50, blank=True)
-    plan = models.ForeignKey('PlanEstudio', blank=True, null=True)
+    plan = models.ForeignKey('PlanEstudio',to_field='clave_plan',blank=True, null=True)
     materias = models.ManyToManyField("Materias", blank=True, null=True)
     # maestros = models.ManyToManyField("Maestros", blank=True, null=True)
 
