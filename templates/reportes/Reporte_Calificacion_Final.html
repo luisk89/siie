@@ -1,0 +1,104 @@
+{% extends 'reportes/base_reporte.html' %}
+{% load static from staticfiles %}
+
+{% block codigo %}
+<b>Codigo:</b>10-01-023
+{% endblock %}
+        {% block report_name  %}
+Acta de Evaluacion final
+    {% endblock %}
+{% block content_report %}
+ <br>
+      <br>
+          <!-- info row -->
+          <div class="row invoice-info">
+            <div class="col-sm-12 invoice-col">
+              <address>
+                <strong>Programa Educativo: </strong>
+                {{ plan }}<br>
+
+              </address>
+            </div><!-- /.col -->
+            <div class="col-sm-12 invoice-col">
+               <address>
+                <strong>Asignatura: </strong>
+                {{ materia }}<br>
+                </address>
+            </div><!-- /.col -->
+            <div class="col-sm-4 invoice-col">
+              <b>Ciclo Escolar: </b><br>{{ ciclo }}
+            </div><!-- /.col -->
+              <div class="col-sm-4 invoice-col">
+              <b>Semestre: </b>
+                  <br>{{ semestre }}
+            </div><!-- /.col -->
+              <div class="col-sm-4 invoice-col">
+              <b>Grupo: </b><br>{{ grupo }}
+            </div><!-- /.col -->
+
+          </div><!-- /.row -->
+<br>
+      <br>
+          <!-- Table row -->
+          <div class="row">
+            <div class="col-xs-12 table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>No.Expediente</th>
+                    <th>Nombre del Alumno</th>
+                    <th>Numero</th>
+                    <th>Letra</th>
+
+                  </tr>
+                </thead>
+                <tbody>
+                {% if listado %}
+                {% for c in listado %}
+                  <tr>
+                    <td>{{ c.matricula }}</td>
+                    <td>{{ c.matricula.nombre }}</td>
+                    <td>{{ c.final }}</td>
+                    <td>El snort testosterone trophy driving gloves handsome</td>
+
+                  </tr>
+                {% endfor %}
+                    {% else %}
+                    <tr>
+                    <td>No existen calificaciones con estos datos</td>
+                    </tr>
+
+                {% endif %}
+
+                </tbody>
+              </table>
+            </div><!-- /.col -->
+          </div><!-- /.row -->
+
+
+{% endblock %}
+
+{% block data_footer %}
+    <br>
+      <br>
+          <div class="row">
+            <!-- -->
+            <div class="col-xs-6">
+              <b class="lead">Profesor de la asignatura :</b>
+                <br>El Profe Rodriguez
+
+            </div><!-- /.col -->
+            <div class="col-xs-6">
+              <b class="lead">Jefe de la división de:{{ grupo.carrera }}</b><br>
+            Perico Perez Ripiao
+            </div><!-- /.col -->
+          </div><!-- /.row -->
+      <br>
+      <br>
+
+     <div class="pull-left">
+              <small>Calificacion Minima Aprobatoria: 70.<br>
+Nota: En caso de tachaduras o enmendaduras al formato, no tendrá validez oficial.</small>
+<br>
+     </div>
+{% endblock %}

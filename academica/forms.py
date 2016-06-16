@@ -417,11 +417,9 @@ class CalificacionForm(forms.ModelForm):
         TabHolder(
             Tab('Estudiante', 'matricula', 'semestre', 'plan', 'materia', 'borrado', 'tipoacreditacion', 'actualizado',
                 'login'),
-            Tab('Primera', 'calif1', 'status1'),
-            Tab('Segunda', 'calif2', 'status2'),
-            Tab('Final', 'cal_final', 'status3'),
-            Tab('Revalidacion', 'fecha_revalidacion', 'fecha_modificacion', 'modulo', 'calif1_res', 'status1_res',
-                'calif2_res', 'status2_res'),
+            Tab('Calificaciones', 'primera', 'status1', 'segunda','status2','tercera','status3','cuarta','status4','quinta','status5','sexta','status6','final','status_final'),
+
+            Tab('Revalidacion', 'fecha_revalidacion', 'fecha_modificacion', 'modulo'),
             Tab('Otros', 'claveubicacion', 'id_curso', 'fecha_extraordinario')
         )
     )

@@ -9,10 +9,9 @@ django-dajaxice==0.7
 django-grappelli==2.6.5
 django-markdown==0.8.4
 django-modalview==0.1.5
+django-wkhtmltopdf==3.0.0
 oauthlib==1.0.3
 psycopg2==2.6.1
 python3-openid==3.0.9
 requests==2.9.1
 requests-oauthlib==0.6.1
-django-wkhtmltopdf==3.0.0
-

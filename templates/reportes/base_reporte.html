@@ -1,0 +1,61 @@
+{% extends 'academica/base.html' %}
+{% load static from staticfiles %}
+{% block content %}
+
+      <section class="invoice">
+          <!-- title row -->
+          <div class="row">
+            <div class="col-xs-12">
+              <h2 class="page-header">
+                <i class="fa fa-globe"></i> Universidad de la Sierra
+                <small class="pull-right">{% block codigo %}
+                    {% endblock %}
+                    </small>
+              </h2>
+            </div><!-- /.col -->
+          </div>
+        <div class="row">
+            <div class="col-xs-12">
+              <h1 class="pull-right">
+                  {% block report_name %}
+
+                      {% endblock %}
+               </h1>
+            </div><!-- /.col -->
+          </div>
+      <br>
+      <br>
+        {% block content_report %}
+
+        {% endblock %}
+
+     <small class="pull-right">Moctezuma,Sonora,Mexico ,a 2/10/2014</small>
+    {% block data_footer %}
+
+    {% endblock %}
+      <div class="pull-right">
+         <img class="profile-user-img img-responsive img-circle" src="{% static 'images/sello1.png' %}" alt="Sello del documento">
+      </div>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+ <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+          <!-- this row will not appear when printing -->
+          <div class="row no-print">
+            <div class="col-xs-12">
+              <a href="#" target="_blank" class="btn btn-default"><i class="fa fa-print"></i> Print</a>
+              <button class="btn btn-success pull-right"><i class="fa fa-remove"></i> Cancelar</button>
+              <button class="btn btn-primary pull-right" style="margin-right: 5px;"><i class="fa fa-download"></i> Generar PDF</button>
+            </div>
+          </div>
+        </section>
+
+{% endblock %}

@@ -102,7 +102,7 @@ class Alumnos(models.Model):
     nom_alumno = models.CharField(max_length=200, verbose_name='Nombre', db_index=True)
     apellido_materno = models.CharField(max_length=50)
     apellido_paterno = models.CharField(max_length=50)
-    curp = models.CharField(max_length=18, blank=True)
+    curp = models.CharField(max_length=25, blank=True)
     edad = models.IntegerField(blank=True, null=True, )
     sexo = models.CharField(max_length=10, blank=True, verbose_name='genero')
     edo_civil = models.CharField(max_length=50, blank=True, verbose_name='Estado Civil')
@@ -140,7 +140,7 @@ class Alumnos(models.Model):
     domicilio_madre = models.CharField(max_length=100, blank=True)
     localidad_madre = models.CharField(max_length=50, blank=True)
     telefono_madre = models.CharField(max_length=50, blank=True)
-    trabaja_actualmente = models.BooleanField(default=False,blank=True)
+    trabaja_actualmente = models.BooleanField(default=False)
     puesto = models.CharField(max_length=50, blank=True)
     sueldo_mensual_alumno = models.DecimalField(max_digits=19, decimal_places=4, blank=True, null=True)
     transporte = models.SmallIntegerField(blank=True, null=True)
@@ -995,13 +995,27 @@ class Calificaciones(models.Model):
     plan = models.ForeignKey(PlanEstudio,to_field='clave_plan',null=True)
 
 
-    calif1 = models.DecimalField(max_digits=5, decimal_places=2, blank=True, verbose_name='Calificacion', null=True, )
+    primera = models.DecimalField(max_digits=3, decimal_places=0, blank=True, verbose_name='1ra Calificacion', null=True, )
     status1 = models.IntegerField(blank=True, null=True, verbose_name='Status')
-    calif2 = models.DecimalField(max_digits=5, decimal_places=2, blank=True, verbose_name='Calificacion', null=True, )
+
+    segunda = models.DecimalField(max_digits=3, decimal_places=0, blank=True, verbose_name='2da Calificacion', null=True, )
     status2 = models.IntegerField(blank=True, verbose_name='Status', null=True)
-    cal_final = models.DecimalField(max_digits=5, decimal_places=2, blank=True, verbose_name='Calificacion',
-                                    null=True, )
+
+    tercera = models.DecimalField(max_digits=3, decimal_places=0, blank=True, verbose_name='3ra Calificacion',null=True, )
     status3 = models.IntegerField(blank=True, verbose_name='Status', null=True, )
+
+    cuarta = models.DecimalField(max_digits=3, decimal_places=0, blank=True, verbose_name='4ta Calificacion',null=True, )
+    status4 = models.IntegerField(blank=True, verbose_name='Status', null=True, )
+
+    quinta = models.DecimalField(max_digits=3, decimal_places=0, blank=True, verbose_name='5ta Calificacion', null=True, )
+    status5 = models.IntegerField(blank=True, verbose_name='Status', null=True, )
+
+    sexta = models.DecimalField(max_digits=3, decimal_places=0, blank=True, verbose_name='6ta Calificacion',null=True, )
+    status6 = models.IntegerField(blank=True, verbose_name='Status', null=True, )
+
+    final = models.DecimalField(max_digits=3, decimal_places=0, blank=True, verbose_name='Calificacion Final',null=True, )
+    status_final = models.IntegerField(blank=True, verbose_name='Status', null=True, )
+
     borrado = models.IntegerField(blank=True, null=True, )
     tipoacreditacion = models.IntegerField(blank=True, null=True, )
     actualizado = models.DateTimeField(blank=True, null=True, )
@@ -1009,12 +1023,8 @@ class Calificaciones(models.Model):
     fecha_modificacion = models.DateTimeField(blank=True, null=True,auto_now_add=True )
     modulo = models.IntegerField(blank=True, null=True, )
     login = models.CharField(max_length=20, blank=True, null=True, )
-    calif1_res = models.DecimalField(max_digits=5, decimal_places=2, blank=True, verbose_name='1ra Calificacion',
-                                     null=True, )
-    status1_res = models.IntegerField(blank=True, verbose_name='Status 1', null=True, )
-    calif2_res = models.DecimalField(max_digits=5, decimal_places=2, blank=True, verbose_name='2da Calificacion',
-                                     null=True, )
-    status2_res = models.IntegerField(blank=True, verbose_name='Status 2', null=True, )
+
+
     claveubicacion = models.CharField(max_length=10, blank=True, null=True, )
     id_curso = models.IntegerField(blank=True, null=True, )
     fecha_extraordinario = models.DateTimeField(blank=True, null=True, )
