@@ -7,14 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('academica', '0014_auto_20160613_1604'),
+        ('academica', '0003_alumnos_grupo'),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='alumnos',
-            name='curp',
-            field=models.CharField(max_length=25, blank=True),
+            name='semestre',
+            field=models.ForeignKey(to='academica.CicloSemestral', to_field='clave'),
             preserve_default=True,
         ),
     ]

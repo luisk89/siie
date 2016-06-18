@@ -7,14 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('academica', '0003_alumnocalificacion_revalidacion'),
+        ('academica', '0001_initial'),
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='calificaciones',
-            name='alta_date_created',
-            field=models.DateTimeField(auto_now_add=True, null=True),
+        migrations.AddField(
+            model_name='grupos',
+            name='clave',
+            field=models.CharField(max_length=50, unique=True, blank=True),
             preserve_default=True,
         ),
     ]

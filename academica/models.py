@@ -115,7 +115,7 @@ class Alumnos(models.Model):
     plan = models.ForeignKey('PlanEstudio',to_field='clave_plan',null=True)
     no_expediente = models.CharField(max_length=50,blank=True)
     matricula = models.CharField(max_length=20, blank=True, null=True,unique=True)
-    semestre = models.ForeignKey('CicloSemestral')
+    semestre = models.ForeignKey('CicloSemestral',to_field='clave')
     condicionado = models.SmallIntegerField(blank=True, null=True,verbose_name='Status')
     domicilio = models.CharField(max_length=100, blank=True)
     colonia = models.CharField(max_length=50, blank=True)
@@ -165,7 +165,8 @@ class Alumnos(models.Model):
     is_deuda = models.BooleanField(default=False)
     # carreras = models.ManyToManyField("Carreras", blank=True, null=True)
     # nuevos campos
-    #grupo = models.ForeignKey('Grupos', blank=True, null=True)
+    grupo = models.ForeignKey('Grupos',to_field='clave',blank=True, null=True)
+
     alta_date_created = models.DateTimeField(auto_now_add=True)
     baja_date_created = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
@@ -536,7 +537,7 @@ class ExtraHorario(models.Model):
 
 
 class Grupos(models.Model):
-    clave = models.CharField(max_length=50, blank=True)
+    clave = models.CharField(max_length=50,blank=True,unique=True)
     nombre = models.CharField(max_length=50, blank=True)
     cant_alumnos = models.IntegerField(blank=True, null=True)
     semestre = models.ForeignKey("CicloSemestral",to_field='clave')

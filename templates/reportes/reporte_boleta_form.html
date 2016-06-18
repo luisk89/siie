@@ -1,12 +1,29 @@
 {% extends 'reportes/base_reporte.html' %}
-{% block codigo %}
-<b>Codigo:</b>10-01-023
-{% endblock %}
-{% block report_name  %}
-Boleta de Evaluacion Semestral
-    {% endblock %}
+{% load static from staticfiles %}
+{% block content %}
 
-{% block content_report %}
+            <form id="myForm" method="post" action={% url 'beca-add' %}>
+      <section class="invoice">
+          <!-- title row -->
+          <div class="row">
+            <div class="col-xs-12">
+              <h2 class="page-header">
+                <i class="fa fa-globe"></i> Universidad de la Sierra
+                <small class="pull-right">
+<b>Código:</b>10-01-023
+</small>
+              </h2>
+            </div><!-- /.col -->
+          </div>
+        <div class="row">
+            <div class="col-xs-12">
+              <h2 class="pull-right">
+Boleta de evaluación semestral
+  </h2>
+            </div><!-- /.col -->
+          </div>
+      <br>
+
  <br>
       <br>
           <!-- info row -->
@@ -45,7 +62,7 @@ Boleta de Evaluacion Semestral
                 <thead>
                   <tr>
                     <th>Clave de Asignatura</th>
-                    <th>Nombre de la Asignatura</th>
+                    <th>Asignatura</th>
                     <th>Numero</th>
                     <th>Letra</th>
 
@@ -77,15 +94,44 @@ Boleta de Evaluacion Semestral
       </div>
           </div><!-- /.row -->
 
-{% endblock %}
+<small class="pull-right">Moctezuma,Sonora,Mexico ,a 2/10/2014</small>
+   <br>
+      <br>
 
-{% block data_footer %}
      <div class="col-xs-12">
               <b>C.p. Omar Armenta Gonzalez<br>
 EL JEFE DEL DEPARTAMENTO DE SERVICIOS ESCOLARES</b>
             </div><!-- /.col -->
+
+       <br>
+       <br>
+       <br>
          <div class="col-xs-12">
               <small> Nota: El presente documento tiene un carácter meramente informativo sobre el estado académico del alumno.</small>
             </div><!-- /.col -->
-
+ <div class="pull-right">
+         <img class="profile-user-img img-responsive img-circle" src="{% static 'images/sello1.png' %}" alt="Sello del documento">
+      </div>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+ <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+          <!-- this row will not appear when printing -->
+          <div class="row no-print">
+            <div class="col-xs-12">
+              <a href="#" target="_blank" class="btn btn-default"><i class="fa fa-print"></i> Print</a>
+              <button class="btn btn-success pull-right"><i class="fa fa-remove"></i> Cancelar</button>
+              <button class="btn btn-primary pull-right" style="margin-right: 5px;"><i class="fa fa-download"></i> Generar PDF</button>
+            </div>
+          </div>
+        </section>
+</form>
 {% endblock %}

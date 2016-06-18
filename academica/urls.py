@@ -116,8 +116,15 @@ urlpatterns = patterns('',
 
                        url(r'escuela/add/$',permission_required('users.permissions_administrador', login_url='login')(  EscuelaCreate.as_view()), name='escuela-add'),
                        url(r'escuela/list/$',permission_required('users.permissions_administrador', login_url='login')(  EscuelaList.as_view()), name='list-escuela'),
+
+
+
+
+
                        url(r'^admin/', include(admin.site.urls)),
                        # url(r'^admin/', include('manager.urls')),
+
+
 
                        ) \
               + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

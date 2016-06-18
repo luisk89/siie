@@ -7,12 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('academica', '0009_auto_20160609_1020'),
+        ('academica', '0002_grupos_clave'),
     ]
 
     operations = [
-        migrations.RemoveField(
+        migrations.AddField(
             model_name='alumnos',
             name='grupo',
+            field=models.ForeignKey(to_field='clave', to='academica.Grupos', null=True, blank=True),
+            preserve_default=True,
         ),
     ]
