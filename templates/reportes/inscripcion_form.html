@@ -10,59 +10,51 @@
             <!-- form start -->
             <form role="form">
                 <div class="box-body">
+                         <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Expediente</th>
+                        <th>A.Paterno</th>
+                        <th>A.Materno</th>
+                        <th>Nombre</th>
+                        <th>Semestre</th>
+                        <th>Baja</th>
+                        <th>Reporte</th>
 
-                    <div class="form-group col-md-4">
-                        <label>Programa Educativo:</label>
-                        <select class="form-control" id="select_carreras">
-                            {% for c in carreras %}
-                                <option value={{ c.clave }}>{{ c }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label>Asignatura:</label>
-                        <select class="form-control" id="select_materias">
-                            {% for m in materias %}
-                                <option value={{ m.clave }}>{{ m }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label>Ciclo:</label>
-                        <select class="form-control" id="select_ciclos">
-                            {% for s in semestres %}
-                                <option value={{ s.clave }}>{{ s }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <br>
+                    </tr>
+                    </thead>
 
-                    <div class="form-group col-md-4">
-                        <label>Semestre:</label>
-                        <select class="form-control" id="select_semestres">
-                            {% for s in semestres %}
-                                <option value={{ s.clave }}>{{ s }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label>Grupo:</label>
-                        <select class="form-control" id="select_grupos">
-                            {% for g in grupos %}
-                                <option value={{ g.clave }}>{{ g }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                    <tbody id="id_table-body">
+                    {% for alumno in alumnos %}
+
+                        <tr>
+                            <td>{{ alumno.id }}</td>
+                            <td>{{ alumno.matricula }}</td>
+                            <td>{{ alumno.apellido_paterno }}</td>
+                            <td>{{ alumno.apellido_materno }}</td>
+                            <td>{{ alumno.nom_alumno }}</td>
+                            <td>{{ alumno.semestre }}</td>
+                            <td>{% if alumno.is_active %}
+                                No{% else %}
+                                Si
+                            {% endif %}
+                            </td>
+                            <td>
+                                 <a href='/report/repinscrip/{{ alumno.id }}' class="btn btn-primary pull-right" id="modalreporte-inscripcion"><i class="fa fa-binoculars"></i>&nbsp;Ver reporte</a>
+                            </td>
+                        </tr>
+                        {#                {% endif %}#}
+                    {% endfor %}
 
 
+                    </tbody>
+
+
+                </table>
                 </div>
                 <!-- /.box-body -->
 
-                <div class="box-footer">
-                    <a href='/pdf/repinscrip/1' class="btn btn-primary pull-right" id="modalreporte-inscripcion"><i class="fa fa-binoculars"></i>&nbsp;Ver reporte</a>
-
-
-                </div>
             </form>
         </div>
         <!-- /.box -->

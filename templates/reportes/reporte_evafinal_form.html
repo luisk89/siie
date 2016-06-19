@@ -1,18 +1,23 @@
 {% extends 'reportes/base_reporte.html' %}
 {% load static from staticfiles %}
 {% block content %}
-            <form id="myForm" method="post" action={% url 'beca-add' %}>
+            <form id="myForm" method="post" action="">
+
   <section class="invoice">
           <!-- title row -->
           <div class="row">
-            <div class="col-xs-12">
-              <h2 class="page-header">
-                <i class="fa fa-globe"></i> Universidad de la Sierra
-                <small class="pull-right"><b>Código:</b>10-01-023
-                    </small>
-              </h2>
-            </div><!-- /.col -->
-          </div>
+                <div class="col-xs-12">
+                     <span class="logo-lg pull-left"><img class="img-responsive" src="{% static 'images/logosiie.png' %}" alt="logo">   </span>
+                    <h2 class="page-header"><b>
+                       Universidad de la Sierra
+                        </b>
+                        <small class="pull-right">
+                            <b>Código:</b>10-01-023
+                        </small>
+                    </h2>
+                </div>
+                <!-- /.col -->
+            </div>
         <div class="row">
             <div class="col-xs-12">
               <h1 class="pull-right">

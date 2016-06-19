@@ -143,6 +143,37 @@ $(document).ready(
 
         }
 
+        //$('#modal-reporte-evafinal').on('click', EnviarDatosEvaFinal);
+        //function EnviarDatosEvaFinal() {
+        //    var carrera = $('#select_carreras').val()
+        //    var materia = $('#select_materias').val()
+        //    var ciclo = $('#select_ciclos').val()
+        //    var grupo = $('#select_grupos').val()
+        //    var semestre = $('#select_semestres').val()
+        //
+        //
+        //
+        //    $.ajax({
+        //        data: {
+        //            'carrera': carrera,
+        //            'materia': materia,
+        //            'ciclo': ciclo,
+        //            'grupo': grupo,
+        //            'semestre':semestre
+        //
+        //        },
+        //        url: '/report/repevafinal/',
+        //        type: 'get',
+        //        success: function (data) {
+        //
+        //            console.log("SUCCESSS")
+        //
+        //        }
+        //
+        //    })
+        //
+        //}
+
         //end document ready
     }
 );
