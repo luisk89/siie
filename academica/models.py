@@ -38,7 +38,7 @@ class AlumnoCalificacion(models.Model):
 
 class Carreras(models.Model):
     nom_carrera = models.CharField(max_length=50, blank=True)
-    clave = models.CharField(max_length=50, blank=True)
+    clave = models.CharField(max_length=50, blank=True,unique=True)
     abreviatura = models.CharField(max_length=50, blank=True)
     plan_estudio = models.ForeignKey('PlanEstudio', blank=True, null=True)
     alta_date_created = models.DateTimeField(auto_now_add=True)
@@ -112,15 +112,15 @@ class Alumnos(models.Model):
     num_afiliacion = models.CharField(max_length=50, blank=True, verbose_name='No De Afiliación')
     generacion = models.IntegerField(blank=True, null=True)
     tipo = models.CharField(max_length=50, blank=True)
-    plan = models.ForeignKey('PlanEstudio',to_field='clave_plan',null=True)
+    plan = models.ForeignKey('PlanEstudio',to_field='clave_plan',blank=True,null=True)
     no_expediente = models.CharField(max_length=50,blank=True)
     matricula = models.CharField(max_length=20, blank=True, null=True,unique=True)
-    semestre = models.ForeignKey('CicloSemestral',to_field='clave')
+    semestre = models.ForeignKey('CicloSemestral',to_field='clave', blank=True,null=True)
     condicionado = models.SmallIntegerField(blank=True, null=True,verbose_name='Status')
     domicilio = models.CharField(max_length=100, blank=True)
     colonia = models.CharField(max_length=50, blank=True)
     localidad = models.CharField(max_length=50, blank=True)
-    municipio = models.ForeignKey("Municipios", blank=True, null=True)
+    municipio = models.CharField(max_length=50,blank=True,null=True)
     cp = models.CharField(max_length=50, blank=True, verbose_name='Codigo Postal')
     telefono = models.CharField(max_length=50, blank=True)
     lugar_nac = models.CharField(max_length=50, blank=True, null=True, verbose_name='Lugar de nacimiento')
@@ -163,7 +163,8 @@ class Alumnos(models.Model):
     email = models.EmailField()
     extracurriculares = models.ManyToManyField('Extracurriculares', blank=True, null=True)
     is_deuda = models.BooleanField(default=False)
-    # carreras = models.ManyToManyField("Carreras", blank=True, null=True)
+    #la carrera es asignada al grupo
+    #carrera = models.ForeignKey("Carreras",to_field='clave',blank=True, null=True)
     # nuevos campos
     grupo = models.ForeignKey('Grupos',to_field='clave',blank=True, null=True)
 
@@ -185,9 +186,9 @@ class Alumnos(models.Model):
 
 
 class Extracurriculares(models.Model):
-    nom_materia = models.CharField(max_length=50, blank=True)
-    clave = models.CharField(max_length=50, blank=True)
-    tipo = models.CharField(max_length=50, blank=True)
+    nom_materia = models.CharField(max_length=50, blank=True,null=True)
+    clave = models.CharField(max_length=50, blank=True,null=True, unique=True)
+    tipo = models.CharField(max_length=50, blank=True,null=True)
     alta_date_created = models.DateTimeField(auto_now_add=True)
     baja_date_created = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
@@ -219,9 +220,10 @@ class Aulas(models.Model):
 
 
 class Bajas(models.Model):
-    alumno = models.ForeignKey(Alumnos)
+    matricula = models.ForeignKey(Alumnos,to_field='matricula',null=True,blank=True)
     motivo = models.CharField(max_length=200, blank=True)
-
+    ciclo=models.ForeignKey('CicloSemestral',to_field='clave',null=True,blank=True)
+    observaciones=models.CharField(max_length=200,blank=True,null=True)
     alta_date_created = models.DateTimeField(auto_now_add=True)
     baja_date_created = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
@@ -233,14 +235,14 @@ class Bajas(models.Model):
 class Becas(models.Model):
     nom_beca = models.CharField(max_length=50, blank=True)
     alumnos = models.ManyToManyField('Alumnos', blank=True, null=True)
-    tipo_beca = models.ForeignKey('TipoBeca')
+    tipo_beca = models.ForeignKey('TipoBeca',to_field='clave_tipo_beca')
     limite_becas_total = models.IntegerField(blank=True, null=True, verbose_name="Limite de becas al 100%(Total)")
     restriccion_becas = models.BooleanField(default=False, verbose_name="Restringir capturas de becas(Nuevo Ingreso)")
     restriccion_promedios = models.BooleanField(default=False, verbose_name="Estatus de candados por promedio")
-    promedio_80_84 = models.CharField(max_length=50, blank=True)
-    promedio_85_89 = models.CharField(max_length=50, blank=True)
-    promedio_90_94 = models.CharField(max_length=50, blank=True)
-    promedio_95_100 = models.CharField(max_length=50, blank=True)
+    promedio_80_84 = models.CharField(max_length=50, blank=True,null=True)
+    promedio_85_89 = models.CharField(max_length=50, blank=True,null=True)
+    promedio_90_94 = models.CharField(max_length=50, blank=True,null=True)
+    promedio_95_100 = models.CharField(max_length=50, blank=True,null=True)
     alta_date_created = models.DateTimeField(auto_now_add=True)
     baja_date_created = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
@@ -277,7 +279,7 @@ class CreditoEducativo(models.Model):
 class Cursos(models.Model):
     nombre = models.CharField(max_length=50, blank=True)
     hora = models.DateTimeField(blank=True, null=True)
-    instructor = models.CharField(max_length=50, blank=True)
+    instructor = models.CharField(max_length=50, blank=True,null=True)
     personas = models.ManyToManyField("Personas", blank=True, null=True)
 
     alta_date_created = models.DateTimeField(auto_now_add=True)
@@ -304,10 +306,13 @@ class Documentos(models.Model):
 
 
 class Empresas(models.Model):
-    nombre = models.CharField(max_length=50, blank=True)
-    tipo = models.CharField(max_length=50, blank=True)
-    tamano = models.CharField(max_length=50, blank=True)
-    municipio = models.CharField(max_length=50, blank=True)
+    nombre = models.CharField(max_length=200, blank=True,null=True)
+    tipo = models.CharField(max_length=50, blank=True,null=True)
+    tamano = models.CharField(max_length=50, blank=True,null=True)
+    municipio = models.CharField(max_length=50, blank=True,null=True)
+    clave=models.CharField(max_length=50,unique=True,blank=True,null=True)
+    direccion=models.CharField(max_length=200, blank=True,null=True)
+    telefono=models.CharField(max_length=250, blank=True,null=True)
 
     alta_date_created = models.DateTimeField(auto_now_add=True)
     baja_date_created = models.DateTimeField(blank=True, null=True)
@@ -540,8 +545,8 @@ class Grupos(models.Model):
     clave = models.CharField(max_length=50,blank=True,unique=True)
     nombre = models.CharField(max_length=50, blank=True)
     cant_alumnos = models.IntegerField(blank=True, null=True)
-    semestre = models.ForeignKey("CicloSemestral",to_field='clave')
-    carrera = models.ForeignKey('Carreras')
+    semestre = models.ForeignKey("CicloSemestral",to_field='clave',blank=True,null=True)
+    carrera = models.ForeignKey('Carreras',to_field='clave',blank=True,null=True)
     actual = models.SmallIntegerField(blank=True, null=True)
     ciclo_escolar = models.CharField(max_length=50, blank=True)
     plan = models.ForeignKey('PlanEstudio',to_field='clave_plan',blank=True, null=True)
@@ -661,7 +666,7 @@ class Maestros(models.Model):
 
 class Municipios(models.Model):
     nom_municipio = models.CharField(max_length=50, blank=True)
-    estado = models.ForeignKey('Estados')
+    estado = models.ForeignKey('Estados',blank=True,null=True)
     alta_date_created = models.DateTimeField(auto_now_add=True)
     baja_date_created = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
