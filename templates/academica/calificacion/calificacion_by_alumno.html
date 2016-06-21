@@ -1,8 +1,16 @@
 {% extends 'academica/base.html' %}
 {% load static from staticfiles %}
+{% load django_bootstrap_breadcrumbs %}
+
+
+                {% block breadcrumbs %}
+                    {{ block.super }}
+                    {% breadcrumb "Calificaciones" "/" %}
+
+                {% endblock %}
 
 {% block content %}
-    <!-- Main content -->
+    {% render_breadcrumbs %}    <!-- Main content -->
     <div class="row">
         <!-- /.box -->
         <div class="box">

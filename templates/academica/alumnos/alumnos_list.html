@@ -1,9 +1,17 @@
 {% extends 'academica/base.html' %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Lista Alumno" "academica.views.AlumnoList" %}
+{% endblock %}
+
 <!-- Main content -->
 {% block content %}
+    {% render_breadcrumbs %}
     <div>
         <form id="search_alumno" class="margin-none form-inline" action="">
-            <div class="widget widget-body-white" style="height: auto;">
+            <div class="widget widget-body-white box box-success" style="height: auto;">
                 {% include "academica/alumnos/search-form.html" %}
                 <div class="modal-footer">
                     <a href="{% url 'alumno-add' %}" class="btn btn-success"><i class="fa fa-file"></i>&nbsp;Crear

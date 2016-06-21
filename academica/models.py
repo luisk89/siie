@@ -58,10 +58,10 @@ class Carreras(models.Model):
 class Materias(models.Model):
     nom_materia = models.CharField(max_length=50, blank=True)
     clave = models.CharField(max_length=50, blank=True, unique=True)
-    semestre = models.ForeignKey('CicloSemestral')
     seriacion = models.CharField(max_length=50, blank=True, verbose_name='Serialización')
     creditos = models.IntegerField(blank=True, null=True)
     # carrera = models.ForeignKey("Carreras")
+    semestre=models.ForeignKey('Semestre',to_field='clave',null=True,blank=True)
     alta_date_created = models.DateTimeField(auto_now_add=True)
     baja_date_created = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
@@ -163,8 +163,8 @@ class Alumnos(models.Model):
     email = models.EmailField()
     extracurriculares = models.ManyToManyField('Extracurriculares', blank=True, null=True)
     is_deuda = models.BooleanField(default=False)
-    #la carrera es asignada al grupo
-    #carrera = models.ForeignKey("Carreras",to_field='clave',blank=True, null=True)
+
+    carrera = models.ForeignKey("Carreras",to_field='clave',blank=True, null=True)
     # nuevos campos
     grupo = models.ForeignKey('Grupos',to_field='clave',blank=True, null=True)
 
@@ -546,11 +546,12 @@ class Grupos(models.Model):
     nombre = models.CharField(max_length=50, blank=True)
     cant_alumnos = models.IntegerField(blank=True, null=True)
     semestre = models.ForeignKey("CicloSemestral",to_field='clave',blank=True,null=True)
-    carrera = models.ForeignKey('Carreras',to_field='clave',blank=True,null=True)
+    #carrera = models.ForeignKey('Carreras',to_field='clave',blank=True,null=True)
     actual = models.SmallIntegerField(blank=True, null=True)
     ciclo_escolar = models.CharField(max_length=50, blank=True)
     plan = models.ForeignKey('PlanEstudio',to_field='clave_plan',blank=True, null=True)
-    materias = models.ManyToManyField("Materias", blank=True, null=True)
+    #el plan tiene las materias
+    #materias = models.ManyToManyField("Materias", blank=True, null=True)
     # maestros = models.ManyToManyField("Maestros", blank=True, null=True)
 
     # nuevos campos
@@ -687,7 +688,6 @@ class Personas(models.Model):
 class PlanEstudio(models.Model):
     nom_plan = models.CharField(max_length=50, blank=True)
     clave_plan = models.CharField(max_length=50, blank=True, unique=True)
-    # carrera = models.ForeignKey('Carreras')
     materias = models.ManyToManyField("Materias", blank=True, null=True)
 
     alta_date_created = models.DateTimeField(auto_now_add=True)
@@ -907,6 +907,15 @@ class Evaluacion(models.Model):
     def get_absolute_url(self):
         return reverse('list-evaluacion')
 
+class Semestre(models.Model):
+    ciclo_semestral=models.ForeignKey('CicloSemestral',to_field='clave')
+    clave = models.CharField(max_length=50,blank=True,unique=True)
+
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
 
 class CicloSemestral(models.Model):
     clave = models.CharField(max_length=50,blank=True,unique=True)
@@ -995,6 +1004,7 @@ class Escuela(models.Model):
 
 class Calificaciones(models.Model):
 
+    #carrera?
     materia = models.ForeignKey(Materias,to_field='clave',null=True)
     matricula = models.ForeignKey(Alumnos,to_field='matricula',null=True)
     semestre = models.ForeignKey(CicloSemestral,to_field='clave',null=True)

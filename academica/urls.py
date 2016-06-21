@@ -74,6 +74,8 @@ urlpatterns = patterns('',
                            name='semestre-update'),
                        url(r'^semestre-ajax/$', CicloSemestralList.SemestreAjax, name='semestre-ajax'),
 
+                        url(r'^extracurricular-ajax/$', ExtracurricularList.ExtracurricularAjax, name='extracurricular-ajax'),
+
                        url(r'baja/$',permission_required('users.permissions_administrador', login_url='login')( BajaCreate.as_view()), name='baja-add'),
 
                        url(r'biblioteca/add$', BibliotecaCreate.as_view(), name='biblio-add'),

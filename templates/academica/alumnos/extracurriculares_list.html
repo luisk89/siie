@@ -1,9 +1,15 @@
 {% extends 'academica/base.html' %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Listado Extracurriculares" "academica.views.ExtracurricularList" %}
+{% endblock %}
 <!-- Main content -->
 {% block content %}
+    {% render_breadcrumbs %}
     <div>
         <form id="search_alumno" class="margin-none form-inline" action="">
-            <div class="widget widget-body-white" style="height: auto;">
+            <div class="widget widget-body-white box box-success" style="height: auto;">
                 {% include "academica/alumnos/extra-search-form.html" %}
                 <div class="modal-footer">
                      <a class="btn btn-success" data-toggle="modal"

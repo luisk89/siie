@@ -1,7 +1,14 @@
 {% extends 'academica/base.html' %}
 {% load crispy_forms_tags %}
 {% load static from staticfiles %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Bajas Alumnos" "academica.views.ReinscripcionList" %}
+{% endblock %}
+
 {% block content %}
+    {% render_breadcrumbs %}
     <input type="hidden" value="{{ semestre.id }}" id="semestreHidden">
    <figure style="padding-bottom: 2%">
 <img src="{% static 'images/noavatar.png' %}" id="foto" class="img-circle">

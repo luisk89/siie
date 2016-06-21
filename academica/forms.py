@@ -341,7 +341,7 @@ class GrupoForm(forms.ModelForm):
         self.helper.label_class = 'form-group'
         self.helper.add_input(Submit('submit', 'Guardar'))
         self.helper.layout = Layout(
-            Fieldset('General','clave', 'nombre', 'cant_alumnos', 'semestre', 'carrera', 'actual', 'ciclo_escolar','horarios', 'plan', 'materias')
+            Fieldset('General','clave', 'nombre', 'cant_alumnos', 'semestre', 'actual', 'ciclo_escolar','horarios', 'plan', 'materias')
         )
 
 
@@ -362,7 +362,7 @@ class GrupoUpdateForm(forms.ModelForm):
         self.helper.label_class = 'form-group'
         self.helper.add_input(Submit('submit', 'Guardar'))
         self.helper.layout = Layout(
-            Fieldset('General','clave','nombre','cant_alumnos','semestre','carrera','actual','ciclo_escolar','plan','materias','horarios'
+            Fieldset('General','clave','nombre','cant_alumnos','semestre','actual','ciclo_escolar','plan','materias','horarios'
             )
         )
 
@@ -722,7 +722,7 @@ class ConsultaCicloSemestralListForm(forms.Form):
 
 
 class ConsultaExtracurricularListForm(forms.Form):
-    clave = forms.CharField(label='Clave Extracurricular', min_length=9, max_length=9, required=False,
+    clave = forms.CharField(label='Clave Extracurricular', max_length=15, required=False,
                             widget=forms.TextInput(attrs={'placeholder': "2020-01", 'class': 'form-control'}))
     nombre = forms.CharField(label='Nombre', min_length=9, max_length=9, required=False)
 

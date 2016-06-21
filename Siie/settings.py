@@ -52,7 +52,8 @@ INSTALLED_APPS = (
     'dajaxice',
     'dajax',
     'wkhtmltopdf',
-    'reportes'
+    'reportes',
+    'django_bootstrap_breadcrumbs'
 
 )
 

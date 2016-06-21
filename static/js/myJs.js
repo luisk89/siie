@@ -103,6 +103,44 @@ $(document).ready(
 
         }
 
+        $('#buscar_extra').on('click', BuscarExtra);
+        function BuscarExtra() {
+            var clave = $('#id_clave').val()
+            var nombre = $('#id_nombre').val()
+
+
+            $.ajax({
+                data: {
+                    'clave': clave,
+                    'nombre': nombre
+
+
+                },
+                url: '/academica/extracurricular-ajax/',
+                type: 'get',
+                success: function (data) {
+                    var objeto = JSON.parse(data)
+                    console.log(objeto.length)
+                    if (objeto.length == 0) {
+                        alert("Criterio de busqueda no encontrado")
+                    }
+                    else {
+                        var html = "";
+                        for (var i = 0; i < objeto.length; i++) {
+                            html += ("<tr><td>" + objeto[i].clave + "</td><td>" + objeto[i].nombre + "</td><td>" + "</tr>")
+
+
+                            $('#id_table-body').html(html)
+                        }
+                    }
+
+                }
+
+            })
+
+        }
+
+
         $('#buscar_semestre').on('click', BuscarS);
         function BuscarS() {
             var clave = $('#id_clave').val()
@@ -178,30 +216,30 @@ $(document).ready(
     }
 );
 
-        function Buscar() {
-            var anio=document.getElementById('id_semestre').selectedOptions[0].innerHTML.split('-')[0]
-            var plan = $('#id_plan').val()
-            console.log(anio)
+function Buscar() {
+    var anio = document.getElementById('id_semestre').selectedOptions[0].innerHTML.split('-')[0]
+    var plan = $('#id_plan').val()
+    console.log(anio)
 
-          $.ajax({
-                data: {
-                    'anio': anio,
-                    'plan': plan,
+    $.ajax({
+        data: {
+            'anio': anio,
+            'plan': plan,
 
-                },
-                url: '/academica/buscarexp-ajax/',
-                type: 'get',
-                success: function (data) {
-                    var objeto = JSON.parse(data)
-                    console.log(objeto)
-                    $('#id_matricula').attr('value',objeto)
-
-                }
-
-            })
-
+        },
+        url: '/academica/buscarexp-ajax/',
+        type: 'get',
+        success: function (data) {
+            var objeto = JSON.parse(data)
+            console.log(objeto)
+            $('#id_matricula').attr('value', objeto)
 
         }
+
+    })
+
+
+}
 
 function cargarPlan() {
     Dajaxice.academica.cargar_plan(Dajax.process);

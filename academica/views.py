@@ -12,9 +12,6 @@ from django.contrib import messages
 from academica.util import LoggedInMixin
 from django.contrib.auth.models import Group
 
-
-
-
 from academica.forms import AlumnosForm, PlanEstudioForm, ExtraCurricularesForm, GrupoForm, HorarioForm, MaestroForm, \
     CalificacionForm, CarreraForm, CicloSemestralForm, BajasForm, MateriaForm, CarreraUpdateForm, EncuestaForm, \
     ConsultaAlumnosListForm, ConsultaCicloSemestralListForm, MunicipioForm, EstadoForm, AulaForm, \
@@ -29,7 +26,7 @@ from academica.models import Alumnos, PlanEstudio, Extracurriculares, Grupos, Ho
     Contabilidad
 
 
-class AlumnoCreate(LoggedInMixin,CreateView):
+class AlumnoCreate(LoggedInMixin, CreateView):
     template_name = 'academica/alumnos/alumnos_form.html'
     model = Alumnos
     fields = '__all__'
@@ -60,14 +57,14 @@ class AlumnoCreate(LoggedInMixin,CreateView):
 
         # en el formulario esta la validacion para el username y el email (el user name que se crea es el nombre del alumno eso tenemos que cambiarlo, hacer una mescla nombre mas apellido o algo asi)
         user = get_user_model().objects.create_user(usuario, email, avatar=avatar, first_name=nombre,
-                                                    last_name=apellido_paterno,no_expediente=matricula)
+                                                    last_name=apellido_paterno, no_expediente=matricula)
         user.set_password(usuario)
         g = Group.objects.get(name='Estudiante')
         g.user_set.add(user)
         user.save()
         messages.success(self.request, 'Alumno Creado Correctamente')
         messages.success(self.request, 'Usuario Creado Correctamente')
-        messages.success(self.request, 'Usuario:  '+ usuario + '  Password:  '+ usuario )
+        messages.success(self.request, 'Usuario:  ' + usuario + '  Password:  ' + usuario)
 
         return super(AlumnoCreate, self).form_valid(form)
 
@@ -78,32 +75,29 @@ class AlumnoCreate(LoggedInMixin,CreateView):
             print(request.GET['plan'])
 
             if request.GET['plan'] and Grupos.objects.filter(plan_id=request.GET['plan']).exists():
-                carrera=Grupos.objects.filter(plan_id=request.GET['plan']).get().carrera.abreviatura
+                carrera = Grupos.objects.filter(plan_id=request.GET['plan']).get().carrera.abreviatura
             else:
-                carrera="CCC"
+                carrera = "CCC"
 
-
-            if request.GET['anio'] :
-                anio=request.GET['anio']
+            if request.GET['anio']:
+                anio = request.GET['anio']
             else:
-                anio="AAAA"
+                anio = "AAAA"
 
+            consect = Alumnos.objects.all().count() + 1
 
-            consect=Alumnos.objects.all().count()+1
-
-            retorno=(anio+"-"+carrera+"-"+consect.__str__())
+            retorno = (anio + "-" + carrera + "-" + consect.__str__())
 
             return HttpResponse(json.dumps(retorno))
         else:
             return redirect('/')
 
 
-class AlumnoUpdate(LoggedInMixin,UpdateView):
+class AlumnoUpdate(LoggedInMixin, UpdateView):
     model = Alumnos
     fields = '__all__'
     template_name = 'academica/alumnos/alumnos_form.html'
     form_class = AlumnosForm
-
 
     def get_context_data(self, **kwargs):
         context = super(AlumnoUpdate, self).get_context_data(**kwargs)
@@ -114,12 +108,12 @@ class AlumnoUpdate(LoggedInMixin,UpdateView):
 
         return context
 
-class AlumnoReins(LoggedInMixin,UpdateView):
+
+class AlumnoReins(LoggedInMixin, UpdateView):
     model = Alumnos
     fields = '__all__'
     template_name = 'academica/alumnos/alumnos_re_form.html'
     form_class = ReinscripcionAlumnoForm
-
 
     def get_context_data(self, **kwargs):
         context = super(AlumnoReins, self).get_context_data(**kwargs)
@@ -131,12 +125,12 @@ class AlumnoReins(LoggedInMixin,UpdateView):
         return context
 
 
-class AlumnoDelete(LoggedInMixin,DeleteView):
+class AlumnoDelete(LoggedInMixin, DeleteView):
     model = Alumnos
     success_url = reverse_lazy('alumno-list')
 
 
-class AlumnoList(LoggedInMixin,ListView):
+class AlumnoList(LoggedInMixin, ListView):
     model = Alumnos
     template_name = 'academica/alumnos/alumnos_list.html'
 
@@ -147,7 +141,7 @@ class AlumnoList(LoggedInMixin,ListView):
         return ctx
 
 
-class ReinscripcionList(LoggedInMixin,ListView):
+class ReinscripcionList(LoggedInMixin, ListView):
     model = Alumnos
     template_name = 'academica/alumnos/alumnos_re.html'
     success_url = reverse_lazy('alumno-re')
@@ -168,7 +162,7 @@ class ReinscripcionList(LoggedInMixin,ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super(ReinscripcionList, self).get_context_data(**kwargs)
-        ctx['alumno_list']=Alumnos.objects.all()
+        ctx['alumno_list'] = Alumnos.objects.all()
         ctx['search_form'] = ConsultaAlumnosListForm
         return ctx
 
@@ -194,7 +188,7 @@ class ReinscripcionList(LoggedInMixin,ListView):
             return redirect('/')
 
 
-class PlanCreate(LoggedInMixin,CreateView):
+class PlanCreate(LoggedInMixin, CreateView):
     model = PlanEstudio
     fields = '__all__'
     template_name = 'academica/planEstudio/planEstudio_form.html'
@@ -209,14 +203,14 @@ class PlanCreate(LoggedInMixin,CreateView):
         return context
 
 
-class PlanUpdate(LoggedInMixin,UpdateView):
+class PlanUpdate(LoggedInMixin, UpdateView):
     model = PlanEstudio
     fields = '__all__'
     template_name = 'academica/planEstudio/planEstudio_form.html'
     form_class = PlanEstudioForm
 
 
-class PlanEstudioList(LoggedInMixin,ListView):
+class PlanEstudioList(LoggedInMixin, ListView):
     model = PlanEstudio
     template_name = 'academica/planEstudio/planEstudio_list.html'
 
@@ -226,7 +220,7 @@ class PlanEstudioList(LoggedInMixin,ListView):
         return context
 
 
-class CarreraCreate(LoggedInMixin,CreateView):
+class CarreraCreate(LoggedInMixin, CreateView):
     model = Carreras
     template_name = 'academica/carrera/carrera_form.html'
     form_class = CarreraForm
@@ -237,14 +231,14 @@ class CarreraCreate(LoggedInMixin,CreateView):
         return context
 
 
-class CarreraUpdate(LoggedInMixin,UpdateView):
+class CarreraUpdate(LoggedInMixin, UpdateView):
     model = Carreras
     fields = '__all__'
     template_name = 'academica/carrera/carrera_update_form.html'
     form_class = CarreraUpdateForm
 
 
-class CarreraList(LoggedInMixin,ListView):
+class CarreraList(LoggedInMixin, ListView):
     model = Carreras
     template_name = 'academica/carrera/carrera_list.html'
 
@@ -256,7 +250,7 @@ class CarreraList(LoggedInMixin,ListView):
         return context
 
 
-class GrupoCreate(LoggedInMixin,CreateView):
+class GrupoCreate(LoggedInMixin, CreateView):
     model = Grupos
     fields = '__all__'
     template_name = 'academica/grupo/grupo_form.html'
@@ -270,7 +264,7 @@ class GrupoCreate(LoggedInMixin,CreateView):
         return cxt
 
 
-class GruposList(LoggedInMixin,ListView):
+class GruposList(LoggedInMixin, ListView):
     model = Grupos
     template_name = 'academica/grupo/grupos_list.html'
 
@@ -280,7 +274,7 @@ class GruposList(LoggedInMixin,ListView):
         return cxt
 
 
-class GrupoUpdate(LoggedInMixin,UpdateView):
+class GrupoUpdate(LoggedInMixin, UpdateView):
     model = Grupos
     fields = '__all__'
     template_name = 'academica/grupo/grupo_update_form.html'
@@ -292,21 +286,21 @@ class GrupoUpdate(LoggedInMixin,UpdateView):
         return context
 
 
-class HorarioCreate(LoggedInMixin,CreateView):
+class HorarioCreate(LoggedInMixin, CreateView):
     model = Horario
     fields = '__all__'
     template_name = 'academica/horario/horario_form.html'
     form_class = HorarioForm
 
 
-class HorarioUpdate(LoggedInMixin,UpdateView):
+class HorarioUpdate(LoggedInMixin, UpdateView):
     model = Horario
     fields = '__all__'
     template_name = 'academica/horario/horario_form.html'
     form_class = HorarioForm
 
 
-class HorarioList(LoggedInMixin,ListView):
+class HorarioList(LoggedInMixin, ListView):
     model = Horario
     template_name = 'academica/horario/horario_list.html'
 
@@ -317,23 +311,29 @@ class HorarioList(LoggedInMixin,ListView):
         return context
 
     def get_my_horarios(request):
-        user=request.user
+        user = request.user
         no_expediente = user.no_expediente
 
         alumnoNombre = Alumnos.objects.get(matricula=no_expediente)
-        if(Grupos.objects.filter(id=alumnoNombre.grupo.id).exists()):
+        if (Grupos.objects.filter(id=alumnoNombre.grupo.id).exists()):
             group = Grupos.objects.filter(id=alumnoNombre.grupo.id).get()
-            horarios=group.horarios
+            horarios = group.horarios
             print(horarios)
         return render_to_response('academica/horario/mis_horarios.html')
 
-class MateriaCreate(LoggedInMixin,CreateView):
+
+class MateriaCreate(LoggedInMixin, CreateView):
     model = Materias
     template_name = 'academica/materia/materia_form.html'
     form_class = MateriaForm
 
+    def get_context_data(self, **kwargs):
+        context = super(MateriaCreate, self).get_context_data(**kwargs)
+        context['form_materia'] = MateriaForm
+        return context
 
-class MateriaList(LoggedInMixin,ListView):
+
+class MateriaList(LoggedInMixin, ListView):
     model = Materias
     template_name = 'academica/materia/materia_list.html'
 
@@ -343,14 +343,14 @@ class MateriaList(LoggedInMixin,ListView):
         return context
 
 
-class MaestroCreate(LoggedInMixin,CreateView):
+class MaestroCreate(LoggedInMixin, CreateView):
     model = Maestros
     fields = '__all__'
     template_name = 'academica/maestro/maestro_form.html'
     form_class = MaestroForm
 
 
-class MaestroList(LoggedInMixin,ListView):
+class MaestroList(LoggedInMixin, ListView):
     model = Maestros
     template_name = 'academica/maestro/maestro_list.html'
 
@@ -360,7 +360,7 @@ class MaestroList(LoggedInMixin,ListView):
         return context
 
 
-class CalificacionCreate(LoggedInMixin,CreateView):
+class CalificacionCreate(LoggedInMixin, CreateView):
     model = Calificaciones
     fields = '__all__'
     template_name = 'academica/calificacion/calificacion_form.html'
@@ -373,7 +373,7 @@ class CalificacionCreate(LoggedInMixin,CreateView):
         return context
 
 
-class CalificacionList(LoggedInMixin,ListView):
+class CalificacionList(LoggedInMixin, ListView):
     model = Calificaciones
     template_name = 'academica/calificacion/calificacion_list.html'
 
@@ -390,24 +390,25 @@ class CalificacionList(LoggedInMixin,ListView):
         list = Calificaciones.objects.filter(matricula=Alumnos.objects.get(id=alumno_id).matricula)
 
         return render_to_response('academica/calificacion/calificacion_by_alumno.html',
-                                  {'listado': list, 'alumno': alumnoNombre,'user':user})
+                                  {'listado': list, 'alumno': alumnoNombre, 'user': user})
 
     def get_my_calificaciones(request):
-        user=request.user
+        user = request.user
         no_expediente = user.no_expediente
         alumnoNombre = Alumnos.objects.get(matricula=no_expediente)
         list = Calificaciones.objects.filter(matricula=no_expediente)
         return render_to_response('academica/calificacion/mis_calificaciones.html',
-                                  {'listado': list, 'alumno': alumnoNombre, 'user':user})
+                                  {'listado': list, 'alumno': alumnoNombre, 'user': user})
 
 
-class CalificacionesUpdate(LoggedInMixin,UpdateView):
+class CalificacionesUpdate(LoggedInMixin, UpdateView):
     model = Calificaciones
     fields = '__all__'
     template_name = 'academica/calificacion/calificacion_update_form.html'
     form_class = CalificacionForm
 
-class CicloSemestralCreate(LoggedInMixin,CreateView):
+
+class CicloSemestralCreate(LoggedInMixin, CreateView):
     model = CicloSemestral
     template_name = 'academica/semestre/ciclosemestral_form.html'
     form_class = CicloSemestralForm
@@ -430,14 +431,14 @@ class CicloSemestralCreate(LoggedInMixin,CreateView):
         return context
 
 
-class CicloSemestralUpdate(LoggedInMixin,UpdateView):
+class CicloSemestralUpdate(LoggedInMixin, UpdateView):
     model = CicloSemestral
     fields = '__all__'
     template_name = 'academica/semestre/ciclosemestralUpdate.html'
     form_class = CicloSemestralForm
 
 
-class CicloSemestralList(LoggedInMixin,ListView):
+class CicloSemestralList(LoggedInMixin, ListView):
     model = CicloSemestral
     template_name = 'academica/semestre/ciclosemestral_list.html'
 
@@ -474,7 +475,7 @@ class CicloSemestralList(LoggedInMixin,ListView):
             return redirect('/')
 
 
-class ExtracurricularesCreate(LoggedInMixin,CreateView):
+class ExtracurricularesCreate(LoggedInMixin, CreateView):
     model = Extracurriculares
     form_class = ExtraCurricularesForm
 
@@ -484,7 +485,7 @@ class ExtracurricularesCreate(LoggedInMixin,CreateView):
         return context
 
 
-class ExtracurricularList(LoggedInMixin,ListView):
+class ExtracurricularList(LoggedInMixin, ListView):
     model = Extracurriculares
     template_name = 'academica/alumnos/extracurriculares_list.html'
 
@@ -495,8 +496,21 @@ class ExtracurricularList(LoggedInMixin,ListView):
         context['form_search_extra'] = ConsultaExtracurricularListForm
         return context
 
+    def ExtracurricularAjax(request):
+        if request.is_ajax():
 
-class BajaCreate(LoggedInMixin,CreateView):
+            ExtraReturn = Extracurriculares.objects.filter(clave__contains=request.GET['clave']).filter(
+                nom_materia__contains=request.GET['nombre'])
+            retorno = []
+            for ex in ExtraReturn:
+                retorno.append({'nombre': ex.nom_materia, 'clave': ex.clave})
+
+            return HttpResponse(json.dumps(retorno))
+        else:
+            return redirect('/')
+
+
+class BajaCreate(LoggedInMixin, CreateView):
     model = Bajas
     form_class = BajasForm
     template_name = 'academica/alumnos/alumnos_baja_list.html'
@@ -508,7 +522,6 @@ class BajaCreate(LoggedInMixin,CreateView):
         context['alumnos_list'] = Alumnos.objects.all()
         context['form'] = BajasForm
         return context
-
 
     def post(self, request, *args, **kwargs):
         # poniendo inactivo el alumno de baja
@@ -522,7 +535,7 @@ class BajaCreate(LoggedInMixin,CreateView):
         return super(BajaCreate, self).post(request, *args, **kwargs)
 
 
-class BibliotecaCreate(LoggedInMixin,CreateView):
+class BibliotecaCreate(LoggedInMixin, CreateView):
     model = Biblioteca
     form_class = BibliotecaForm
     template_name = 'academica/deudas/biblioteca_form.html'
@@ -536,7 +549,7 @@ class BibliotecaCreate(LoggedInMixin,CreateView):
         return super(BibliotecaCreate, self).form_valid(form)
 
 
-class BibliotecaList(LoggedInMixin,ListView):
+class BibliotecaList(LoggedInMixin, ListView):
     model = Biblioteca
     template_name = 'academica/deudas/biblioteca_list.html'
 
@@ -546,7 +559,7 @@ class BibliotecaList(LoggedInMixin,ListView):
         return context
 
 
-class BajaBiblioteca(LoggedInMixin,ListView):
+class BajaBiblioteca(LoggedInMixin, ListView):
     model = Biblioteca
     template_name = 'academica/deudas/baja_biblioteca.html'
 
@@ -557,14 +570,14 @@ class BajaBiblioteca(LoggedInMixin,ListView):
         return context
 
 
-class BibliotecaUpdate(LoggedInMixin,UpdateView):
+class BibliotecaUpdate(LoggedInMixin, UpdateView):
     model = Biblioteca
     fields = '__all__'
     template_name = 'academica/deudas/biblioteca_form.html'
     form_class = BibliotecaForm
 
 
-class CentroComputoCreate(LoggedInMixin,CreateView):
+class CentroComputoCreate(LoggedInMixin, CreateView):
     model = CentroComputo
     form_class = CentroComputoForm
     template_name = 'academica/deudas/centrocomputo_form.html'
@@ -584,7 +597,7 @@ class CentroComputoCreate(LoggedInMixin,CreateView):
         return context
 
 
-class CentroComputoList(LoggedInMixin,ListView):
+class CentroComputoList(LoggedInMixin, ListView):
     model = CentroComputo
     template_name = 'academica/deudas/centrocomputo_list.html'
 
@@ -595,7 +608,7 @@ class CentroComputoList(LoggedInMixin,ListView):
         return context
 
 
-class BajaCC(LoggedInMixin,ListView):
+class BajaCC(LoggedInMixin, ListView):
     model = CentroComputo
     template_name = 'academica/deudas/baja_cc.html'
 
@@ -605,14 +618,14 @@ class BajaCC(LoggedInMixin,ListView):
         return context
 
 
-class CCUpdate(LoggedInMixin,UpdateView):
+class CCUpdate(LoggedInMixin, UpdateView):
     model = CentroComputo
     fields = '__all__'
     template_name = 'academica/deudas/centrocomputo_form.html'
     form_class = CentroComputoForm
 
 
-class ContabilidadCreate(LoggedInMixin,CreateView):
+class ContabilidadCreate(LoggedInMixin, CreateView):
     model = Contabilidad
     form_class = ContabilidadForm
     template_name = 'academica/deudas/contabilidad_form.html'
@@ -632,7 +645,7 @@ class ContabilidadCreate(LoggedInMixin,CreateView):
         return context
 
 
-class ContabilidadList(LoggedInMixin,ListView):
+class ContabilidadList(LoggedInMixin, ListView):
     model = Contabilidad
     template_name = 'academica/deudas/contabilidad_list.html'
 
@@ -644,7 +657,7 @@ class ContabilidadList(LoggedInMixin,ListView):
         return context
 
 
-class BajaConta(LoggedInMixin,ListView):
+class BajaConta(LoggedInMixin, ListView):
     model = Contabilidad
     template_name = 'academica/deudas/baja_cont.html'
 
@@ -654,21 +667,21 @@ class BajaConta(LoggedInMixin,ListView):
         return context
 
 
-class ContaUpdate(LoggedInMixin,UpdateView):
+class ContaUpdate(LoggedInMixin, UpdateView):
     model = Contabilidad
     fields = '__all__'
     template_name = 'academica/deudas/contabilidad_form.html'
     form_class = ContabilidadForm
 
 
-class EncuestaCreate(LoggedInMixin,CreateView):
+class EncuestaCreate(LoggedInMixin, CreateView):
     model = EncuestaEgresados
     form_class = EncuestaForm
     template_name = 'academica/encuesta/encuesta_form.html'
     success_url = 'encuesta/list'
 
 
-class EncuestaList(LoggedInMixin,ListView):
+class EncuestaList(LoggedInMixin, ListView):
     model = EncuestaEgresados
     template_name = 'academica/encuesta/encuesta_list.html'
 
@@ -678,14 +691,14 @@ class EncuestaList(LoggedInMixin,ListView):
         return context
 
 
-class MunicipioCreate(LoggedInMixin,CreateView):
+class MunicipioCreate(LoggedInMixin, CreateView):
     model = Municipios
     form_class = MunicipioForm
     template_name = 'academica/localidad/municipio_form.html'
     success_url = 'municipio/list'
 
 
-class MunicipioList(LoggedInMixin,ListView):
+class MunicipioList(LoggedInMixin, ListView):
     model = Municipios
     template_name = 'academica/localidad/municipio_list.html'
 
@@ -695,14 +708,14 @@ class MunicipioList(LoggedInMixin,ListView):
         return context
 
 
-class EstadoCreate(LoggedInMixin,CreateView):
+class EstadoCreate(LoggedInMixin, CreateView):
     model = Estados
     form_class = EstadoForm
     template_name = 'academica/localidad/estado_form.html'
     success_url = 'estado/list'
 
 
-class EstadoList(LoggedInMixin,ListView):
+class EstadoList(LoggedInMixin, ListView):
     model = Estados
     template_name = 'academica/localidad/estado_list.html'
 
@@ -711,14 +724,15 @@ class EstadoList(LoggedInMixin,ListView):
         context['form_estado'] = EstadoForm
         return context
 
-class AulaCreate(LoggedInMixin,CreateView):
+
+class AulaCreate(LoggedInMixin, CreateView):
     model = Aulas
     form_class = AulaForm
     template_name = 'academica/extracurricular/aula_form.html'
     success_url = 'aula/list'
 
 
-class AulaList(LoggedInMixin,ListView):
+class AulaList(LoggedInMixin, ListView):
     model = Aulas
     template_name = 'academica/extracurricular/aula_list.html'
 
@@ -728,7 +742,7 @@ class AulaList(LoggedInMixin,ListView):
         return context
 
 
-class Home(LoggedInMixin,TemplateView):
+class Home(LoggedInMixin, TemplateView):
     template_name = 'academica/index.html'
 
     def get_context_data(self, **kwargs):
@@ -738,7 +752,7 @@ class Home(LoggedInMixin,TemplateView):
         return context
 
 
-class ServicioSocialCreate(LoggedInMixin,CreateView):
+class ServicioSocialCreate(LoggedInMixin, CreateView):
     model = ServicioHoras
     form_class = ServicioSocialForm
     template_name = 'academica/servicios/servicio_form.html'
@@ -749,7 +763,8 @@ class ServicioSocialCreate(LoggedInMixin,CreateView):
         context['form_servicio'] = ServicioSocialForm
         return context
 
-class ServicioSocialList(LoggedInMixin,ListView):
+
+class ServicioSocialList(LoggedInMixin, ListView):
     model = ServicioHoras
     template_name = 'academica/servicios/servicio_list.html'
 
@@ -760,7 +775,7 @@ class ServicioSocialList(LoggedInMixin,ListView):
         return context
 
 
-class ServicioLiberadosList(LoggedInMixin,ListView):
+class ServicioLiberadosList(LoggedInMixin, ListView):
     model = ServicioHoras
     template_name = 'academica/servicios/serviciolib_list.html'
 
@@ -770,20 +785,22 @@ class ServicioLiberadosList(LoggedInMixin,ListView):
         context['list_liberados'] = ServicioHoras.objects.filter(is_active=True)
         return context
 
-class ServicioUpdate(LoggedInMixin,UpdateView):
+
+class ServicioUpdate(LoggedInMixin, UpdateView):
     model = ServicioHoras
     fields = '__all__'
     template_name = 'academica/servicios/servicio_update_form.html'
     form_class = ServicioSocialForm
 
-class BecaCreate(LoggedInMixin,CreateView):
+
+class BecaCreate(LoggedInMixin, CreateView):
     model = Becas
     form_class = BecasForm
     template_name = 'academica/beca/beca_form.html'
     success_url = 'beca/list'
 
 
-class BecaList(LoggedInMixin,ListView):
+class BecaList(LoggedInMixin, ListView):
     model = Becas
     template_name = 'academica/beca/beca_list.html'
 
@@ -793,14 +810,14 @@ class BecaList(LoggedInMixin,ListView):
         return context
 
 
-class TipoBecaCreate(LoggedInMixin,CreateView):
+class TipoBecaCreate(LoggedInMixin, CreateView):
     model = TipoBeca
     form_class = TiposBecasForm
     template_name = 'academica/beca/tipobeca_form.html'
     success_url = 'tbeca/list'
 
 
-class TipoBecaList(LoggedInMixin,ListView):
+class TipoBecaList(LoggedInMixin, ListView):
     model = TipoBeca
     template_name = 'academica/beca/tipobeca_list.html'
 
@@ -810,7 +827,7 @@ class TipoBecaList(LoggedInMixin,ListView):
         return context
 
 
-class EscuelaCreate(LoggedInMixin,CreateView):
+class EscuelaCreate(LoggedInMixin, CreateView):
     model = Escuela
     form_class = EscuelaForm
     template_name = 'academica/escuela/escuela_form.html'
@@ -821,7 +838,7 @@ class EscuelaCreate(LoggedInMixin,CreateView):
         return context
 
 
-class EscuelaList(LoggedInMixin,ListView):
+class EscuelaList(LoggedInMixin, ListView):
     model = Escuela
     template_name = 'academica/escuela/escuela_list.html'
 
@@ -829,7 +846,3 @@ class EscuelaList(LoggedInMixin,ListView):
         context = super(EscuelaList, self).get_context_data(**kwargs)
         context['form_escuela'] = EscuelaForm
         return context
-
-
-
-

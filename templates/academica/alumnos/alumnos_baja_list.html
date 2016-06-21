@@ -1,7 +1,14 @@
 {% extends 'academica/base.html' %}
 {% load crispy_forms_tags %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="active">{% breadcrumb "Baja" "academica.views.BajaCreate" %}</li>
+{% endblock %}
 <!-- Main content -->
 {% block content %}
+    {% render_breadcrumbs %}
     <div class="row">
         <!-- /.box -->
         <div class="box">
