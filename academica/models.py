@@ -916,6 +916,8 @@ class Semestre(models.Model):
     baja_date_created = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
+    def get_absolute_url(self):
+        return reverse('list-sem')
 
 class CicloSemestral(models.Model):
     clave = models.CharField(max_length=50,blank=True,unique=True)

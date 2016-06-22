@@ -16,8 +16,7 @@
             <div class="widget widget-body-white box box-success" style="height: auto;">
                 {% include "academica/semestre/search-form.html" %}
                 <div class="modal-footer">
-                    <a class="btn btn-success" data-toggle="modal"
-                       data-target="#modalSemestre"
+                    <a class="btn btn-success" href='{% url 'semestre-add' %}'
                        id="crear-semestre-id"><i class="fa fa-file"></i>&nbsp;Crear Ciclo</a>
                     <a id="buscar_semestre" href="#" class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;Buscar</a>
                 </div>
@@ -85,7 +84,7 @@
     <script>
 
     </script>
-    {% include 'academica/semestre/ciclosemestral_form.html' %}
+
 {% endblock %}
 
 

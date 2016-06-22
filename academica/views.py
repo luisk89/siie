@@ -17,13 +17,13 @@ from academica.forms import AlumnosForm, PlanEstudioForm, ExtraCurricularesForm,
     ConsultaAlumnosListForm, ConsultaCicloSemestralListForm, MunicipioForm, EstadoForm, AulaForm, \
     ConsultaExtracurricularListForm, \
     ServicioSocialForm, BecasForm, TiposBecasForm, EscuelaForm, BibliotecaForm, CentroComputoForm, ContabilidadForm, \
-    ReinscripcionAlumnoForm, GrupoUpdateForm
+    ReinscripcionAlumnoForm, GrupoUpdateForm, SemestreForm
 
 # Create your views here.
 from academica.models import Alumnos, PlanEstudio, Extracurriculares, Grupos, Horario, Maestros, Materias, \
     AlumnoCalificacion, Carreras, CicloSemestral, Bajas, Evaluacion, EncuestaEgresados, AlumnoPrevio, Aulas, \
     Municipios, Estados, Calificaciones, ServicioHoras, Becas, TipoBeca, Escuela, Biblioteca, CentroComputo, \
-    Contabilidad
+    Contabilidad, Semestre
 
 
 class AlumnoCreate(LoggedInMixin, CreateView):
@@ -846,3 +846,17 @@ class EscuelaList(LoggedInMixin, ListView):
         context = super(EscuelaList, self).get_context_data(**kwargs)
         context['form_escuela'] = EscuelaForm
         return context
+
+class SemestreCreate(LoggedInMixin, CreateView):
+    model = Semestre
+    form_class = SemestreForm
+    template_name = 'academica/semestre/semestre_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(SemestreCreate, self).get_context_data(**kwargs)
+        context['form_sem'] = SemestreForm
+        return context
+
+class SemestreList(LoggedInMixin, ListView):
+    model = Semestre
+    template_name = 'academica/semestre/semestre_list.html'

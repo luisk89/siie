@@ -1,19 +1,14 @@
 {% extends 'academica/base.html' %}
-{% load crispy_forms_tags %}
 {% load static from staticfiles %}
 {% load django_bootstrap_breadcrumbs %}
+{% load crispy_forms_tags %}
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "materia" "academica.views.MateriaCreate" %}
+    {% breadcrumb "Semestre" "academica.views.SemestreCreate" %}
 {% endblock %}
-
 
 {% block content %}
     {% render_breadcrumbs %}
-
-          {% crispy form_materia %}
-
-
+{% crispy form_sem %}
 {% endblock %}
-

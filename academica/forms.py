@@ -17,7 +17,7 @@ from crispy_forms.bootstrap import TabHolder, Tab, InlineField, InlineCheckboxes
 
 from academica.models import Alumnos, PlanEstudio, Extracurriculares, Grupos, Horario, Materias, Maestros, \
     Carreras, CicloSemestral, Bajas, Evaluacion, EncuestaEgresados, Aulas, Municipios, \
-    Estados, Calificaciones, ServicioHoras, Becas, TipoBeca, Escuela, Biblioteca, Contabilidad, CentroComputo
+    Estados, Calificaciones, ServicioHoras, Becas, TipoBeca, Escuela, Biblioteca, Contabilidad, CentroComputo, Semestre
 
 
 class ExtraCurricularesForm(forms.ModelForm):
@@ -108,7 +108,7 @@ class AlumnosForm(forms.ModelForm):
         self.fields['semestre'].widget.attrs['onchange']="javascript:Buscar()"
         self.fields['trabaja_actualmente'].widget.attrs['onchange']="javascript:showContent1()"
 
-        self.helper.form_class = 'box'
+        self.helper.form_class = 'box box-success'
         self.helper.label_class = 'form-group'
         self.helper.add_input(Submit('submit', 'Guardar'))
 
@@ -233,7 +233,7 @@ class ReinscripcionAlumnoForm(forms.ModelForm):
         self.fields['semestre'].widget.attrs['onchange']="javascript:Buscar()"
         self.fields['trabaja_actualmente'].widget.attrs['onchange']="javascript:showContent1()"
 
-        self.helper.form_class = 'box'
+        self.helper.form_class = 'box box-success'
         self.helper.label_class = 'form-group'
         self.helper.add_input(Submit('submit', 'Guardar'))
 
@@ -337,7 +337,7 @@ class GrupoForm(forms.ModelForm):
         self.fields['cant_alumnos'].widget.attrs['min'] = 0
         self.fields['actual'].widget.attrs['min'] = 0
         self.helper = FormHelper()
-        self.helper.form_class = 'box'
+        self.helper.form_class = 'box box-success'
         self.helper.label_class = 'form-group'
         self.helper.add_input(Submit('submit', 'Guardar'))
         self.helper.layout = Layout(
@@ -358,7 +358,7 @@ class GrupoUpdateForm(forms.ModelForm):
         self.fields['cant_alumnos'].widget.attrs['min'] = 0
         self.fields['actual'].widget.attrs['min'] = 0
         self.helper = FormHelper()
-        self.helper.form_class = 'box'
+        self.helper.form_class = 'box box-success'
         self.helper.label_class = 'form-group'
         self.helper.add_input(Submit('submit', 'Guardar'))
         self.helper.layout = Layout(
@@ -395,6 +395,18 @@ class MateriaForm(forms.ModelForm):
         model = Materias
         exclude = ("baja_date_created", "alta_date_created", "is_active")
 
+    def __init__(self, *args, **kwargs):
+        super(MateriaForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_class = 'box box-success'
+        self.helper.label_class = 'form-group'
+        self.helper.add_input(Submit('submit', 'Guardar'))
+        self.helper.add_layout(
+        Fieldset('Agregar nueva materia', 'nom_materia','clave','seriacion','creditos','semestre'
+                 ),
+
+    )
+
 
 class MaestroForm(forms.ModelForm):
     helper = FormHelper()
@@ -410,7 +422,7 @@ class MaestroForm(forms.ModelForm):
 
 class CalificacionForm(forms.ModelForm):
     helper = FormHelper()
-    helper.form_class = 'box'
+    helper.form_class = 'box box-success'
     helper.label_class = 'form-group'
     helper.add_input(Submit('submit', 'Guardar'))
     helper.layout = Layout(
@@ -463,19 +475,21 @@ class CicloSemestralForm(forms.ModelForm):
                 attrs={'placeholder': 'dd/mm/aaaa', 'class': 'datepicker ui-widget ui-widget-content date-field'}),
             'fecha_fin_programacion': forms.DateInput(
                 attrs={'placeholder': 'dd/mm/aaaa', 'class': 'datepicker ui-widget ui-widget-content date-field'}),
+
         }
 
     def __init__(self, *args, **kwargs):
         super(CicloSemestralForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_class = 'box'
+        self.helper.form_class = 'box box-success'
         self.helper.label_class = 'form-group'
+        self.fields['anio'].widget.attrs['min'] = 0
+        self.fields['anio'].widget.attrs['placeholder'] = '1989'
         self.helper.add_input(Submit('submit', 'Guardar'))
 
         self.helper.layout = Layout(
-            Fieldset('General',
-                     'clave', 'ciclo_sep', 'anio', 'periodo', 'fecha_inicio', 'fecha_termino', ),
-            'fecha_inicio_programacion', 'fecha_fin_programacion', 'vigente',
+            Fieldset('Ciclo Semestral','clave', 'ciclo_sep', 'anio', 'periodo', 'fecha_inicio', 'fecha_termino','fecha_inicio_programacion', 'fecha_fin_programacion', 'vigente')
+
         )
 
 
@@ -504,7 +518,7 @@ class BibliotecaForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(BibliotecaForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_class = 'box'
+        self.helper.form_class = 'box box-success'
         self.helper.label_class = 'form-group'
         self.helper.add_input(Submit('submit', 'Aceptar', css_class="btn btn-success"))
         self.helper.layout = Layout(
@@ -521,7 +535,7 @@ class CentroComputoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CentroComputoForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_class = 'box'
+        self.helper.form_class = 'box box-success'
         self.helper.label_class = 'form-group'
         self.helper.add_input(Submit('submit', 'Aceptar', css_class="btn btn-success"))
         self.helper.layout = Layout(
@@ -538,7 +552,7 @@ class ContabilidadForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ContabilidadForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_class = 'box'
+        self.helper.form_class = 'box box-success'
         self.helper.label_class = 'form-group'
         self.helper.add_input(Submit('submit', 'Aceptar', css_class="btn btn-success"))
         self.helper.layout = Layout(
@@ -579,7 +593,7 @@ class EncuestaForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(EncuestaForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_class = 'box'
+        self.helper.form_class = 'box box-success'
         self.helper.label_class = 'form-group'
         self.helper.add_input(Submit('submit', 'Guardar', css_class='btn btn-primary'))
         self.helper.layout = Layout(
@@ -737,7 +751,7 @@ class ServicioSocialForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ServicioSocialForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_class = 'box'
+        self.helper.form_class = 'box box-success'
         self.helper.label_class = 'form-group'
         self.helper.layout = Layout(
             'alumno', 'proyecto', 'horas', 'is_active'
@@ -767,7 +781,7 @@ class BecasForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(BecasForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_class = 'box'
+        self.helper.form_class = 'box box-success'
         self.helper.label_class = 'form-group'
         self.helper.layout = Layout(
             Fieldset('Becas', 'nom_beca', 'tipo_beca', 'alumnos'),
@@ -800,5 +814,22 @@ class EscuelaForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(EscuelaForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_class = 'box'
+        self.helper.form_class = 'box box-success'
         self.helper.label_class = 'form-group'
+
+class SemestreForm(forms.ModelForm):
+    class Meta:
+        model = Semestre
+        fields = '__all__'
+        exclude=('alta_date_created','baja_date_created','is_active')
+
+
+    def __init__(self, *args, **kwargs):
+        super(SemestreForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_class = 'box box-success'
+        self.helper.label_class = 'form-group'
+        self.helper.add_input(Submit('submit', 'Guardar'))
+        self.helper.layout = Layout(
+            Fieldset('Agregar Semestre','ciclo_semestral', 'clave')
+        )

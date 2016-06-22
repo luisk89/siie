@@ -15,7 +15,7 @@ from academica.views import PlanCreate, \
     ServicioSocialList, ServicioLiberadosList, BecaCreate, BecaList, TipoBecaCreate, TipoBecaList, EscuelaCreate, \
     EscuelaList, BibliotecaCreate, BibliotecaList, CentroComputoCreate, CentroComputoList, ContabilidadCreate, \
     ContabilidadList, BajaBiblioteca, BibliotecaUpdate, BajaCC, CCUpdate, BajaConta, ContaUpdate, CalificacionesUpdate, \
-    ServicioUpdate, AlumnoReins
+    ServicioUpdate, AlumnoReins, SemestreCreate, SemestreList
 
 __author__ = 'Luisk'
 
@@ -73,7 +73,8 @@ urlpatterns = patterns('',
                        url(r'ciclosemestral/update/(?P<pk>[0-9]+)/$',permission_required('users.permissions_administrador', login_url='login')(  CicloSemestralUpdate.as_view()),
                            name='semestre-update'),
                        url(r'^semestre-ajax/$', CicloSemestralList.SemestreAjax, name='semestre-ajax'),
-
+                       url(r'semestre/add/$',permission_required('users.permissions_administrador', login_url='login')(SemestreCreate.as_view()), name='sem-add'),
+                       url(r'semestre/list/$',permission_required('users.permissions_administrador', login_url='login')( SemestreList.as_view()), name='list-sem'),
                         url(r'^extracurricular-ajax/$', ExtracurricularList.ExtracurricularAjax, name='extracurricular-ajax'),
 
                        url(r'baja/$',permission_required('users.permissions_administrador', login_url='login')( BajaCreate.as_view()), name='baja-add'),

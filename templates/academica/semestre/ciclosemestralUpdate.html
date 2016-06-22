@@ -3,10 +3,7 @@
 {% load static from staticfiles %}
 {% block content %}
     {% csrf_token %}
-    <div class="modal-header">
-                <h3 class="box-title">Gestionar Ciclo Semestral</h3>
-                         </div>
-          {% crispy form %}
+            {% crispy form %}
 
 
 {% endblock %}
