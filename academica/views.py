@@ -11,14 +11,14 @@ from django.views.generic.list import ListView
 from django.contrib import messages
 from academica.util import LoggedInMixin
 from django.contrib.auth.models import Group
-
+from django.utils.translation import activate
 from academica.forms import AlumnosForm, PlanEstudioForm, ExtraCurricularesForm, GrupoForm, HorarioForm, MaestroForm, \
     CalificacionForm, CarreraForm, CicloSemestralForm, BajasForm, MateriaForm, CarreraUpdateForm, EncuestaForm, \
     ConsultaAlumnosListForm, ConsultaCicloSemestralListForm, MunicipioForm, EstadoForm, AulaForm, \
     ConsultaExtracurricularListForm, \
     ServicioSocialForm, BecasForm, TiposBecasForm, EscuelaForm, BibliotecaForm, CentroComputoForm, ContabilidadForm, \
     ReinscripcionAlumnoForm, GrupoUpdateForm, SemestreForm
-
+activate('es')
 # Create your views here.
 from academica.models import Alumnos, PlanEstudio, Extracurriculares, Grupos, Horario, Maestros, Materias, \
     AlumnoCalificacion, Carreras, CicloSemestral, Bajas, Evaluacion, EncuestaEgresados, AlumnoPrevio, Aulas, \
@@ -53,7 +53,7 @@ class AlumnoCreate(LoggedInMixin, CreateView):
         matricula = form.cleaned_data['matricula']
 
         # poniendo como usuario la primeraletra del nombre y el apellido->Ej. rrosal
-        usuario = username[0] + apellido_paterno
+        usuario = matricula
 
         # en el formulario esta la validacion para el username y el email (el user name que se crea es el nombre del alumno eso tenemos que cambiarlo, hacer una mescla nombre mas apellido o algo asi)
         user = get_user_model().objects.create_user(usuario, email, avatar=avatar, first_name=nombre,
@@ -349,6 +349,31 @@ class MaestroCreate(LoggedInMixin, CreateView):
     template_name = 'academica/maestro/maestro_form.html'
     form_class = MaestroForm
 
+
+    def form_valid(self, form):
+        username = form.cleaned_data['no_expediente']
+        email = form.cleaned_data['email']
+        nombre = form.cleaned_data['nombre']
+        apellido = form.cleaned_data['last_name']
+        avatar = form.cleaned_data['foto']
+        no_expediente = form.cleaned_data['no_expediente']
+
+        # poniendo como usuario la primeraletra del nombre y el apellido->Ej. rrosal
+        usuario = username
+        password = username
+
+        # en el formulario esta la validacion para el username y el email (el user name que se crea es el nombre del alumno eso tenemos que cambiarlo, hacer una mescla nombre mas apellido o algo asi)
+        user = get_user_model().objects.create_user(usuario, email, avatar=avatar, first_name=nombre,
+                                                    last_name=apellido, no_expediente=no_expediente)
+        user.set_password(usuario)
+        g = Group.objects.get(name='Maestro')
+        g.user_set.add(user)
+        user.save()
+        messages.success(self.request, 'Maestro Creado Correctamente')
+        messages.success(self.request, 'Usuario Creado Correctamente')
+        messages.success(self.request, 'Usuario:  ' + usuario + '  Password:  ' + password)
+
+        return super(MaestroCreate, self).form_valid(form)
 
 class MaestroList(LoggedInMixin, ListView):
     model = Maestros

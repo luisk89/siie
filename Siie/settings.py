@@ -129,6 +129,7 @@ GRAPPELLI_ADMIN_TITLE = 'Siie'
 
 AUTH_USER_MODEL = 'users.User'
 
+LANGUAGE_CODE = 'es'
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
@@ -144,7 +145,7 @@ AUTH_USER_MODEL = 'users.User'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'Siie',
+        'NAME': 'Test',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'localhost',

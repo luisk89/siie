@@ -114,7 +114,7 @@ class Alumnos(models.Model):
     tipo = models.CharField(max_length=50, blank=True)
     plan = models.ForeignKey('PlanEstudio',to_field='clave_plan',blank=True,null=True)
     no_expediente = models.CharField(max_length=50,blank=True)
-    matricula = models.CharField(max_length=20, blank=True, null=True,unique=True)
+    matricula = models.CharField(max_length=20, blank=False, null=False,unique=True)
     semestre = models.ForeignKey('CicloSemestral',to_field='clave', blank=True,null=True)
     condicionado = models.SmallIntegerField(blank=True, null=True,verbose_name='Status')
     domicilio = models.CharField(max_length=100, blank=True)
@@ -152,15 +152,15 @@ class Alumnos(models.Model):
     oratoria = models.BooleanField(default=False)
     otro_interes = models.BooleanField(default=False,verbose_name='otros')
     credencial = models.SmallIntegerField(blank=True, null=True)
-    foto = models.ImageField(upload_to='fotos',blank=True)
+    foto = models.ImageField(upload_to='fotos',blank=True , default='foto.png')
     firma = models.ImageField(upload_to='firma',blank=True)
 
     escuela_procedencia = models.ForeignKey('Escuela',blank=True, null=True, verbose_name='Escuela')
     anio_egreso=models.CharField(max_length=5,blank=True, null=True,verbose_name='Egreso')
-    promedio_bachiller=models.DecimalField(decimal_places=3,max_digits=3,blank=True, null=True,verbose_name='Promedio')
+    promedio_bachiller=models.IntegerField(verbose_name='Promedio', null=True, blank=True)
 
     password = models.CharField(max_length=50, blank=True)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     extracurriculares = models.ManyToManyField('Extracurriculares', blank=True, null=True)
     is_deuda = models.BooleanField(default=False)
 
@@ -648,9 +648,11 @@ class LiberacionDocumentos(models.Model):
 
 
 class Maestros(models.Model):
-    nombre = models.CharField(max_length=50, blank=True)
-    no_expediente = models.CharField(max_length=50, blank=True, verbose_name='Numero de Empleado')
-
+    nombre = models.CharField(max_length=50, blank=True, verbose_name='Nombre')
+    last_name = models.CharField(max_length=100, blank=True, verbose_name='Apellido')
+    no_expediente = models.CharField(max_length=50, blank=False, verbose_name='Numero de Empleado', unique=True)
+    email = models.EmailField(default='email@email.com',unique=True)
+    foto = models.ImageField(upload_to='fotos', blank=True , verbose_name='Foto', default='foto.png')
     alta_date_created = models.DateTimeField(auto_now_add=True)
     baja_date_created = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
