@@ -241,6 +241,26 @@ function Buscar() {
 
 }
 
+$('#select-materias').on('change',Cargar)
+function Cargar(){
+    var id=$(this).val()
+    $.ajax({
+        data:{'id':id},
+        url:'/academica/matcal-ajax/',
+        type:'get',
+        success : function(data){
+            var object=JSON.parse(data)
+            var html=""
+             for (var i = 0; i < object.length; i++) {
+                  html += ("<tr><td>" + object[i].matricula + "</td><td>" + object[i].nombre + "</td><td>" + object[i].apellido_paterno + "</td><td>" + object[i].apellido_materno + "</td><td><a href=califcreatajax/"+object[i].id+"/ >Actualizar</a>" + "</td></tr>")
+                            $('#result-calificaciones').html(html)
+             }
+        }
+    });
+}
+
+
+
 function cargarPlan() {
     Dajaxice.academica.cargar_plan(Dajax.process);
 }

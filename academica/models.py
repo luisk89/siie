@@ -62,6 +62,7 @@ class Materias(models.Model):
     creditos = models.IntegerField(blank=True, null=True)
     # carrera = models.ForeignKey("Carreras")
     semestre=models.ForeignKey('Semestre',to_field='clave',null=True,blank=True)
+    profesor=models.ForeignKey('Maestros',to_field='no_expediente',null=True,blank=True)
     alta_date_created = models.DateTimeField(auto_now_add=True)
     baja_date_created = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
@@ -552,7 +553,7 @@ class Grupos(models.Model):
     plan = models.ForeignKey('PlanEstudio',to_field='clave_plan',blank=True, null=True)
     #el plan tiene las materias
     #materias = models.ManyToManyField("Materias", blank=True, null=True)
-    # maestros = models.ManyToManyField("Maestros", blank=True, null=True)
+    #maestros = models.ManyToManyField("Maestros",to_field='no_expediente',blank=True, null=True)
 
     # nuevos campos
     #horario = models.ForeignKey("Horario", blank=True, null=True)
@@ -649,7 +650,7 @@ class LiberacionDocumentos(models.Model):
 
 class Maestros(models.Model):
     nombre = models.CharField(max_length=50, blank=True)
-    no_expediente = models.CharField(max_length=50, blank=True, verbose_name='Numero de Empleado')
+    no_expediente = models.CharField(max_length=50, blank=True, verbose_name='Numero de Empleado',unique=True)
 
     alta_date_created = models.DateTimeField(auto_now_add=True)
     baja_date_created = models.DateTimeField(blank=True, null=True)

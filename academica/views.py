@@ -408,6 +408,8 @@ class CalificacionesUpdate(LoggedInMixin, UpdateView):
     form_class = CalificacionForm
 
 
+
+
 class CicloSemestralCreate(LoggedInMixin, CreateView):
     model = CicloSemestral
     template_name = 'academica/semestre/ciclosemestral_form.html'
@@ -860,3 +862,37 @@ class SemestreCreate(LoggedInMixin, CreateView):
 class SemestreList(LoggedInMixin, ListView):
     model = Semestre
     template_name = 'academica/semestre/semestre_list.html'
+
+class CalificacionesListByMateria(ListView):
+
+    def get_materias_by_profesor(request,id_profesor):
+        if Materias.objects.filter(profesor=id_profesor).exists():
+            materias=Materias.objects.filter(profesor=id_profesor)
+            return render_to_response('academica/calificacion/profesor_calificaciones.html',
+                                  {'listado': materias})
+        return render_to_response('academica/calificacion/profesor_calificaciones.html')
+
+    def get_calificaciones_by_materia_ajax(request):
+        if request.is_ajax():
+
+            alumnos=Alumnos.objects.all()
+            retorno=[]
+            #print(Alumnos.objects.get(id=1).plan.materias.all().count())
+            for a in alumnos:
+                for m in a.plan.materias.all():
+                    if m.clave==request.GET['id']:
+                        retorno.append({'nombre':a.nom_alumno,'apellido_paterno':a.apellido_paterno,'apellido_materno':a.apellido_materno,'matricula':a.matricula,'id':a.id})
+            return HttpResponse(json.dumps(retorno))
+        else:
+            redirect('academica/calificacion/profesor_calificaciones.html')
+
+
+    def agregar_calificaciones_alumno_ajax(request,pk):
+
+        alumno=Alumnos.objects.get(id=pk)
+
+        # if(Alumnos.objects.get(id=pk)):
+        #      return render_to_response('academica/calificacion/calificacion_update_form.html.html',{'form_calificacion':CalificacionForm,'alumno':alumno.matricula})
+        # else:
+
+        return render_to_response('academica/calificacion/calificacion_form.html',{'form_calificacion':CalificacionForm,'alumno':alumno.matricula})
