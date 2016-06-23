@@ -15,7 +15,7 @@ from academica.views import PlanCreate, \
     ServicioSocialList, ServicioLiberadosList, BecaCreate, BecaList, TipoBecaCreate, TipoBecaList, EscuelaCreate, \
     EscuelaList, BibliotecaCreate, BibliotecaList, CentroComputoCreate, CentroComputoList, ContabilidadCreate, \
     ContabilidadList, BajaBiblioteca, BibliotecaUpdate, BajaCC, CCUpdate, BajaConta, ContaUpdate, CalificacionesUpdate, \
-    ServicioUpdate, AlumnoReins, SemestreCreate, SemestreList
+    ServicioUpdate, AlumnoReins, SemestreCreate, SemestreList, CalificacionesListByMateria
 
 __author__ = 'Luisk'
 
@@ -123,7 +123,9 @@ urlpatterns = patterns('',
                        url(r'escuela/add/$',permission_required('users.permissions_administrador', login_url='login')(  EscuelaCreate.as_view()), name='escuela-add'),
                        url(r'escuela/list/$',permission_required('users.permissions_administrador', login_url='login')(  EscuelaList.as_view()), name='list-escuela'),
 
-
+                       url(r'califprof/(?P<id_profesor>[0-9]+)/$', CalificacionesListByMateria.get_materias_by_profesor, name='profesor-calificacion'),
+                       url(r'^matcal-ajax/$', CalificacionesListByMateria.get_calificaciones_by_materia_ajax, name='materias-calificacion'),
+                        url(r'califcreatajax/(?P<pk>[0-9]+)/$', CalificacionesListByMateria.agregar_calificaciones_alumno_ajax, name='alum-calif'),
 
 
 
