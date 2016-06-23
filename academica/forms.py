@@ -18,7 +18,7 @@ from crispy_forms.bootstrap import TabHolder, Tab, InlineField, InlineCheckboxes
 from academica.models import Alumnos, PlanEstudio, Extracurriculares, Grupos, Horario, Materias, Maestros, \
     Carreras, CicloSemestral, Bajas, Evaluacion, EncuestaEgresados, Aulas, Municipios, \
     Estados, Calificaciones, ServicioHoras, Becas, TipoBeca, Escuela, Biblioteca, Contabilidad, CentroComputo, Semestre
-
+from users.models import User
 
 class ExtraCurricularesForm(forms.ModelForm):
     helper = FormHelper()
@@ -172,25 +172,18 @@ class AlumnosForm(forms.ModelForm):
 
         )
 
-    def clean(self):
-        cleaned_data = self.cleaned_data.copy()
-
-        #        email = cleaned_data.pop('email', None)
-        #       nom_alumno = cleaned_data.pop('nom_alumno', None)
-
-        #        if get_user_model().objects.filter(username=nom_alumno).exists():
-        #            self._errors['nom_alumno'] = ErrorList(['Ya existe ese usuario '])
-
-        #        if get_user_model().objects.filter(email=email).exists():
-        #           self._errors['email'] = ErrorList(['Ya existe ese correo '])
-
-        fecha_nacimiento = cleaned_data.pop('fecha_nacimiento', None)
-        fecha_actual = timezone.now()
-
-
-# if fecha_nacimiento is not None:
-#            if fecha_actual < fecha_nacimiento:
-#                raise forms.ValidationError("El fecha no debe ser mayor a la fecha actual")
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        is_insert = self.instance.pk is None
+        if is_insert:
+            try:
+                User.objects.get(email=email)
+            except User.DoesNotExist:
+                return email
+            raise forms.ValidationError("Existe un usuario con este email por favor cambiarlo")
+        else:
+            pass
+        return email
 
 class ReinscripcionAlumnoForm(forms.ModelForm):
     class Meta:
@@ -412,7 +405,7 @@ class MaestroForm(forms.ModelForm):
     helper = FormHelper()
     helper.add_input(Submit('submit', 'Guardar'))
     helper.layout = Layout(
-        Fieldset('Registro de profesor', 'nombre', 'no_expediente')
+        Fieldset('Registro de profesor', 'nombre', 'last_name', 'no_expediente', 'email', 'foto')
     )
 
     class Meta:

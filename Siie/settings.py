@@ -129,6 +129,7 @@ GRAPPELLI_ADMIN_TITLE = 'Siie'
 
 AUTH_USER_MODEL = 'users.User'
 
+
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
@@ -155,7 +156,7 @@ DATABASES = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es'
 
 TIME_ZONE = 'UTC'
 

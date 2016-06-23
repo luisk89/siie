@@ -152,6 +152,21 @@
 
                 </ul>
             </li>
+             <li class="treeview">
+                <a href="#"><i class="fa fa-file-pdf-o"></i> <span>Reportes</span> <i
+                        class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="/pdf/evafinal">Acta de evaluación final</a></li>
+                    <li><a href="/pdf/boleta">Boleta semestral</a></li>
+                    <li><a href="/pdf/inscripcion">Cédula de inscripción</a></li>
+                    <li><a href="/pdf/reinscripcion">Cédula de Re-inscripción</a></li>
+                    <li><a href="/pdf/certifinal">Certificado Final</a></li>
+                    <li><a href="/pdf/kardex">Kardex</a></li>
+
+
+                </ul>
+                </li>
                 {% endif %}
             {% endfor %}
             {% for group in user.groups.all %}
@@ -215,22 +230,25 @@
 
             {% endif %}
             {% endfor %}
-
-         <li class="treeview">
-                <a href="#"><i class="fa fa-file-pdf-o"></i> <span>Reportes</span> <i
+            {% for group in user.groups.all %}
+                {% if group.name == 'Maestro' %}
+                <li class="treeview">
+                <a href="#"><i class="fa fa-book"></i> <span>Maestro</span> <i
                         class="fa fa-angle-left pull-right"></i>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a href="/pdf/evafinal">Acta de evaluación final</a></li>
-                    <li><a href="/pdf/boleta">Boleta semestral</a></li>
-                    <li><a href="/pdf/inscripcion">Cédula de inscripción</a></li>
-                    <li><a href="/pdf/reinscripcion">Cédula de Re-inscripción</a></li>
-                    <li><a href="/pdf/certifinal">Certificado Final</a></li>
-                    <li><a href="/pdf/kardex">Kardex</a></li>
-
+                    <li><a href="{% url 'list-alumno' %}">Listas</a></li>
+                    <li><a href="{% url 'list-calificacion' %}">Calificaciones</a></li>
+                    <li><a href="/academica/planEstudio/list/">Plan de Estudio</a></li>
+                    <li><a href="{% url 'list-horario' %}">Horario</a></li>
 
                 </ul>
                 </li>
+
+            {% endif %}
+            {% endfor %}
+
+
 
 
 {#            <li class="treeview">#}
