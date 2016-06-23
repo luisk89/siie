@@ -1,828 +1,1061 @@
 # -*- encoding: utf-8 -*-
-import datetime
-from django.contrib.admin import widgets
-from django.db.models.fields import DateField
-from django.utils import timezone
-from academica import mixins
+from django.core.urlresolvers import reverse
 
-__author__ = 'Luisk'
-from django import forms
-from django.forms.util import ErrorList
-from django.contrib.auth import get_user_model
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Submit, Button, Div, HTML
-from crispy_forms.bootstrap import TabHolder, Tab, InlineField, InlineCheckboxes
+from django.db import models
 
 
+class Aceptados(models.Model):
+    alumno_previo = models.ForeignKey('AlumnoPrevio', blank=True, null=True)
+    aceptado = models.SmallIntegerField(blank=True, null=True)
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
 
-from academica.models import Alumnos, PlanEstudio, Extracurriculares, Grupos, Horario, Materias, Maestros, \
-    Carreras, CicloSemestral, Bajas, Evaluacion, EncuestaEgresados, Aulas, Municipios, \
-    Estados, Calificaciones, ServicioHoras, Becas, TipoBeca, Escuela, Biblioteca, Contabilidad, CentroComputo, Semestre
-from users.models import User
 
-class ExtraCurricularesForm(forms.ModelForm):
-    helper = FormHelper()
-    helper.layout = Layout(
-        'nom_materia', 'clave', 'tipo'
-    )
+class AlumnoCalificacion(models.Model):
+    # alumno = models.ForeignKey('Alumnos')
+    horario = models.ForeignKey('Horario', blank=True, null=True)
+    calificacion = models.IntegerField(blank=True, null=True)
+    calificacion_letra = models.CharField(max_length=100, blank=True)
+    semestre = models.ForeignKey('CicloSemestral')
+    # materia = models.ForeignKey('Materias')
+    revalidacion = models.SmallIntegerField(blank=True, null=True)
+    ciclo = models.CharField(max_length=50, blank=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
-        model = Extracurriculares
-        fields = '__all__'
+        ordering = ["calificacion"]
+
+    def get_absolute_url(self):
+        return reverse('list-evaluacion')
+
+    def __str__(self):
+        return self.calificacion_letra
 
 
-GENERO_SELECT = (
-    ('M', 'Masculino'),
-    ('F', 'Femenino'),
+class Carreras(models.Model):
+    nom_carrera = models.CharField(max_length=50, blank=True)
+    clave = models.CharField(max_length=50, blank=True,unique=True)
+    abreviatura = models.CharField(max_length=50, blank=True)
+    plan_estudio = models.ForeignKey('PlanEstudio', blank=True, null=True)
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
 
-)
-Estado_Civil = (
-    ('Soltero', 'Soltero'),
-    ('Casado', 'Casado'),
-)
-Servicio_medico = (
-    ('1', 'IMSS UNISIERRA'),
-    ('2', 'IMSS'),
-    ('3', 'ISSSTESON'),
-    ('4', 'ISSSTE'),
-    ('5', 'SEGURO POPULAR'),
-    ('6', 'PARTICULAR')
-)
-
-Condicionado_select = (
-    ('1', 'Normal'),
-    ('2', 'Revalidacion'),
-    ('3', 'Equivalencia')
-)
-Sangre_select = (
-    ('A+', 'A+'),
-    ('A-', 'A-'),
-    ('B+', 'B+'),
-    ('B-', 'B-'),
-    ('AB+', 'AB+'),
-    ('AB-', 'AB-'),
-    ('O+', 'O+'),
-    ('O-', 'O-')
-
-)
-hoy = datetime.datetime.now()
-hoy = hoy.strftime('%Y-%m-%d')
-style_numeric = 'ui-widget ui-widget-content numeric-field'
-
-
-class AlumnosForm(forms.ModelForm):
     class Meta:
-        model = Alumnos
-        fields = '__all__'
-        widgets = {
-            'fecha_nacimiento': forms.DateInput(attrs={'placeholder': 'dd/mm/aaaa','class': 'datepicker ui-widget ui-widget-content date-field'}),
-        }
+        ordering = ["nom_carrera"]
+
+    def get_absolute_url(self):
+        return reverse('list-carrera')
+
+    def __str__(self):
+        return self.nom_carrera
 
 
+class Materias(models.Model):
+    nom_materia = models.CharField(max_length=50, blank=True)
+    clave = models.CharField(max_length=50, blank=True, unique=True)
+    seriacion = models.CharField(max_length=50, blank=True, verbose_name='Serialización')
+    creditos = models.IntegerField(blank=True, null=True)
+    # carrera = models.ForeignKey("Carreras")
+    semestre=models.ForeignKey('Semestre',to_field='clave',null=True,blank=True)
+    profesor=models.ForeignKey('Maestros',to_field='no_expediente',null=True,blank=True)
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
 
-    sexo = forms.ChoiceField(choices=GENERO_SELECT,
-                             widget=forms.Select(), required=False, label='Genero')
-    edo_civil = forms.ChoiceField(choices=Estado_Civil,
-                                  widget=forms.Select(), required=False, label='Estado Civil')
-    servicio_medico = forms.ChoiceField(choices=Servicio_medico,
-                                        widget=forms.Select(), required=False)
-    condicionado = forms.ChoiceField(choices=Condicionado_select,
-                                     widget=forms.Select(), required=False, initial='Normal', label='Status')
+    class Meta:
+        ordering = ["nom_materia"]
 
-    tipo_sangre = forms.ChoiceField(choices=Sangre_select,
-                                    widget=forms.Select(), required=False)
-    edad = forms.IntegerField(required=False)
-    promedio_bachiller=forms.FloatField(label='Promedio', initial=0.0, widget=forms.TextInput(attrs={'class':style_numeric}), required=False)
-    curp=forms.CharField(max_length=18,required=False)
-    #semestre = forms.ChoiceField(choices=mixins.getCicloSemestral(),widget=forms.Select(attrs={'class': 'form-control'}), required=False,initial=mixins.getSemestreActive())
+    def get_absolute_url(self):
+        return reverse('list-materias')
 
-
-    def __init__(self, *args, **kwargs):
-        super(AlumnosForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.fields['edad'].widget.attrs['min'] = 1
-        self.fields['sueldo_mensual'].widget.attrs['min'] = 0
-        self.fields['sueldo_mensual_alumno'].widget.attrs['min'] = 0
-        self.fields['matricula'].widget.attrs['onfocus']="javascript:Buscar()"
-        self.fields['plan'].widget.attrs['onchange']="javascript:Buscar()"
-        self.fields['semestre'].widget.attrs['onchange']="javascript:Buscar()"
-        self.fields['trabaja_actualmente'].widget.attrs['onchange']="javascript:showContent1()"
-
-        self.helper.form_class = 'box box-success'
-        self.helper.label_class = 'form-group'
-        self.helper.add_input(Submit('submit', 'Guardar'))
+    def __str__(self):
+        return self.nom_materia
 
 
-        self.helper.layout = Layout(
-            TabHolder(
-                Tab(
-                    'Datos Personales',
-                    'nom_alumno',
-                    'apellido_paterno',
-                    'apellido_materno',
-                    Fieldset('Credencial', 'foto', 'firma', id='img'),
-                    'curp',
-                    'sexo',
-                    'edad',
-                    'lugar_nac',
-                    'fecha_nacimiento',
-                    'edo_civil',
-                    Fieldset('Datos medicos', 'tipo_sangre', 'alergias', 'enfermedades', HTML("""<div id="div_id_seguro" class="checkbox"> <label for="id_seguro" class=""> <input checked="checked" class="checkboxinput" id="id_seguro" name="seguro" type="checkbox" value="1" onchange="javascript:showContent()">
-                    Servicio Medico</label> </div>"""), Div('num_afiliacion', 'servicio_medico', id='div_ServicioMedico')),
-                    Fieldset('Domicilio', 'colonia', 'localidad', 'municipio', 'domicilio', 'telefono', 'cp', 'email',
-                             id='domicilio')
-                ),
+class AlumnoPrevio(models.Model):
+    alumno = models.ForeignKey("Alumnos", unique=True)
 
-                Tab(
-                    'Datos Escolares',
-                    Fieldset('Procedencia', HTML("""<a data-toggle="modal"
-                        data-target="#modalEscuela"
-                        id="modal-button"><i class="fa fa-plus-circle"></i></a>"""), 'escuela_procedencia',
-                             'anio_egreso', 'promedio_bachiller'),
-                    Fieldset('Control Escolar', HTML("""<a data-toggle="modal"
-                        data-target="#modalPlan"
-                        id="modal-button"><i class="fa fa-plus-circle"></i></a>"""), 'plan', 'semestre', 'matricula',
-                             'condicionado'),
-                    # HTML("""<a data-toggle="modal"
-                    #     data-target="#modalGrupo"
-                    #     id="modal-button"><i class="fa fa-plus-circle"></i></a>"""),
-                    #          'grupo', 'is_active'
-                    css_class="nav nav-tabs"
-                ),
-                Tab(
-                    'Documentacion y Datos Varios',
-                    Fieldset('En caso de emergencia avisar a:', 'contacto_emergencia', 'contacto_domicilio',
-                             'contacto_tel'),
-                    Fieldset('Datos Familiares',
-                             Fieldset('Datos del padre o tutor', 'nombre_tutor', 'domicilio_tutor', 'localidad_tutor',
-                                      'telefono_tutor', 'ocupacion_tutor', 'sueldo_mensual', HTML(
-                                     """<a class="btn btn-block btn-success" id='id_boton_copiar' onclick="javascript:datacopy()"><i class="fa fa-copy"></i>Copiar datos a la madre</a>""")),
-                             Fieldset('Datos de la madre', 'nombre_materno', 'domicilio_madre', 'localidad_madre',
-                                      'telefono_madre'),
-                             Fieldset('Datos generales', 'trabaja_actualmente',
-                                      Div('puesto', 'sueldo_mensual_alumno', id='div_trabajo_estudiante'))),
-                    Fieldset('Actividades', 'deporte_practica', 'credencial'),
-                    Div('oratoria', 'musica',
-                        'teatro', 'declamacion', 'otro_interes'),
-                    css_class="nav nav-tabs"
-                ),
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
 
-                css_class="nav-tabs-custom"
-            )
+    def __str__(self):
+        return self.alumno.nom_alumno + " " + self.alumno.apellido_paterno + " " + self.alumno.apellido_materno
 
+
+class AlumnoProyecto(models.Model):
+    alumno = models.ForeignKey('Alumnos', blank=True, null=True)
+    proyecto = models.ForeignKey('ServicioEstadia', blank=True, null=True)
+    concluyo = models.SmallIntegerField(blank=True, null=True)
+    calificado = models.SmallIntegerField(blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Alumnos(models.Model):
+    nom_alumno = models.CharField(max_length=200, verbose_name='Nombre', db_index=True)
+    apellido_materno = models.CharField(max_length=50)
+    apellido_paterno = models.CharField(max_length=50)
+    curp = models.CharField(max_length=25, blank=True)
+    edad = models.IntegerField(blank=True, null=True, )
+    sexo = models.CharField(max_length=10, blank=True, verbose_name='genero')
+    edo_civil = models.CharField(max_length=50, blank=True, verbose_name='Estado Civil')
+    tipo_sangre = models.CharField(max_length=10, blank=True)
+    servicio_medico = models.SmallIntegerField(blank=True, null=True)
+    instituto = models.CharField(max_length=50, blank=True)
+    num_afiliacion = models.CharField(max_length=50, blank=True, verbose_name='No De Afiliación')
+    generacion = models.IntegerField(blank=True, null=True)
+    tipo = models.CharField(max_length=50, blank=True)
+    plan = models.ForeignKey('PlanEstudio',to_field='clave_plan',blank=True,null=True)
+    no_expediente = models.CharField(max_length=50,blank=True)
+    matricula = models.CharField(max_length=20, blank=False, null=False,unique=True)
+    semestre = models.ForeignKey('CicloSemestral',to_field='clave', blank=True,null=True)
+    condicionado = models.SmallIntegerField(blank=True, null=True,verbose_name='Status')
+    domicilio = models.CharField(max_length=100, blank=True)
+    colonia = models.CharField(max_length=50, blank=True)
+    localidad = models.CharField(max_length=50, blank=True)
+    municipio = models.CharField(max_length=50,blank=True,null=True)
+    cp = models.CharField(max_length=50, blank=True, verbose_name='Codigo Postal')
+    telefono = models.CharField(max_length=50, blank=True)
+    lugar_nac = models.CharField(max_length=50, blank=True, null=True, verbose_name='Lugar de nacimiento')
+    fecha_nacimiento = models.DateTimeField(blank=True, null=True)
+    alergias = models.CharField(max_length=50, blank=True)
+    enfermedades = models.CharField(max_length=50, blank=True, verbose_name='Padecimientos')
+    contacto_emergencia = models.CharField(max_length=50, blank=True)
+    contacto_domicilio = models.CharField(max_length=100, blank=True)
+    contacto_tel = models.CharField(max_length=50, blank=True)
+    nombre_tutor = models.CharField(max_length=50, blank=True)
+    nombre_materno = models.CharField(max_length=50, blank=True)
+    domicilio_tutor = models.CharField(max_length=100, blank=True)
+    localidad_tutor = models.CharField(max_length=50, blank=True)
+    telefono_tutor = models.CharField(max_length=50, blank=True)
+    ocupacion_tutor = models.CharField(max_length=50, blank=True)
+    sueldo_mensual = models.DecimalField(max_digits=19, decimal_places=4, blank=True, null=True)
+    domicilio_madre = models.CharField(max_length=100, blank=True)
+    localidad_madre = models.CharField(max_length=50, blank=True)
+    telefono_madre = models.CharField(max_length=50, blank=True)
+    trabaja_actualmente = models.BooleanField(default=False)
+    puesto = models.CharField(max_length=50, blank=True)
+    sueldo_mensual_alumno = models.DecimalField(max_digits=19, decimal_places=4, blank=True, null=True)
+    transporte = models.SmallIntegerField(blank=True, null=True)
+    transporte_universidad = models.SmallIntegerField(blank=True, null=True)
+    deporte_practica = models.CharField(max_length=50, blank=True)
+    musica = models.BooleanField(default=False)
+    teatro = models.BooleanField(default=False)
+    declamacion = models.BooleanField(default=False)
+    oratoria = models.BooleanField(default=False)
+    otro_interes = models.BooleanField(default=False,verbose_name='otros')
+    credencial = models.SmallIntegerField(blank=True, null=True)
+    foto = models.ImageField(upload_to='fotos',blank=True , default='foto.png')
+    firma = models.ImageField(upload_to='firma',blank=True)
+
+    escuela_procedencia = models.ForeignKey('Escuela',blank=True, null=True, verbose_name='Escuela')
+    anio_egreso=models.CharField(max_length=5,blank=True, null=True,verbose_name='Egreso')
+    promedio_bachiller=models.IntegerField(verbose_name='Promedio', null=True, blank=True)
+
+    password = models.CharField(max_length=50, blank=True)
+    email = models.EmailField(unique=True)
+    extracurriculares = models.ManyToManyField('Extracurriculares', blank=True, null=True)
+    is_deuda = models.BooleanField(default=False)
+
+    carrera = models.ForeignKey("Carreras",to_field='clave',blank=True, null=True)
+    # nuevos campos
+    grupo = models.ForeignKey('Grupos',to_field='clave',blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["nom_alumno"]
+        permissions = (
+            ("can_view_servicios_escolares", "Servicios Escolares"),
         )
 
-    def clean_email(self):
-        email = self.cleaned_data['email']
-        is_insert = self.instance.pk is None
-        if is_insert:
-            try:
-                User.objects.get(email=email)
-            except User.DoesNotExist:
-                return email
-            raise forms.ValidationError("Existe un usuario con este email por favor cambiarlo")
-        else:
-            pass
-        return email
-
-class ReinscripcionAlumnoForm(forms.ModelForm):
-    class Meta:
-        model = Alumnos
-        fields = '__all__'
-        widgets = {
-            'fecha_nacimiento': forms.DateInput(attrs={'placeholder': 'dd/mm/aaaa','class': 'datepicker ui-widget ui-widget-content date-field'}),
-        }
-
-
-
-    sexo = forms.ChoiceField(choices=GENERO_SELECT,
-                             widget=forms.Select(), required=False, label='Genero')
-    edo_civil = forms.ChoiceField(choices=Estado_Civil,
-                                  widget=forms.Select(), required=False, label='Estado Civil')
-    servicio_medico = forms.ChoiceField(choices=Servicio_medico,
-                                        widget=forms.Select(), required=False)
-    condicionado = forms.ChoiceField(choices=Condicionado_select,
-                                     widget=forms.Select(), required=False, initial='Normal', label='Status')
-
-    tipo_sangre = forms.ChoiceField(choices=Sangre_select,
-                                    widget=forms.Select(), required=False)
-    edad = forms.IntegerField(required=False)
-    promedio_bachiller=forms.FloatField(label='Promedio', initial=0.0, widget=forms.TextInput(attrs={'class':style_numeric}), required=False)
-
-
-
-    curp=forms.CharField(max_length=18,required=False)
-
-
-    def __init__(self, *args, **kwargs):
-        super(ReinscripcionAlumnoForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.fields['edad'].widget.attrs['min'] = 1
-        self.fields['sueldo_mensual'].widget.attrs['min'] = 0
-        self.fields['sueldo_mensual_alumno'].widget.attrs['min'] = 0
-        self.fields['is_active'].widget = forms.HiddenInput()
-        self.fields['matricula'].widget.attrs['onfocus']="javascript:Buscar()"
-        self.fields['plan'].widget.attrs['onchange']="javascript:Buscar()"
-        self.fields['semestre'].widget.attrs['onchange']="javascript:Buscar()"
-        self.fields['trabaja_actualmente'].widget.attrs['onchange']="javascript:showContent1()"
-
-        self.helper.form_class = 'box box-success'
-        self.helper.label_class = 'form-group'
-        self.helper.add_input(Submit('submit', 'Guardar'))
-
-
-        self.helper.layout = Layout(
-            TabHolder(
-                Tab(
-                    'Datos Personales',
-                    'is_active',
-                    'nom_alumno',
-                    'apellido_paterno',
-                    'apellido_materno',
-                    Fieldset('Credencial', 'foto', 'firma', id='img'),
-                    'curp',
-                    'sexo',
-                    'edad',
-                    'lugar_nac',
-                    'fecha_nacimiento',
-                    'edo_civil',
-                    Fieldset('Datos medicos', 'tipo_sangre', 'alergias', 'enfermedades', HTML("""<div id="div_id_seguro" class="checkbox"> <label for="id_seguro" class=""> <input checked="checked" class="checkboxinput" id="id_seguro" name="seguro" type="checkbox" value="1" onchange="javascript:showContent()">
-                    Servicio Medico</label> </div>"""), Div('num_afiliacion', 'servicio_medico', id='div_ServicioMedico')),
-                    Fieldset('Domicilio', 'colonia', 'localidad', 'municipio', 'domicilio', 'telefono', 'cp', 'email',
-                             id='domicilio')
-                ),
-
-                Tab(
-                    'Datos Escolares',
-                    Fieldset('Procedencia', HTML("""<a data-toggle="modal"
-                        data-target="#modalEscuela"
-                        id="modal-button"><i class="fa fa-plus-circle"></i></a>"""), 'escuela_procedencia',
-                             'anio_egreso', 'promedio_bachiller'),
-                    Fieldset('Control Escolar', HTML("""<a data-toggle="modal"
-                        data-target="#modalPlan"
-                        id="modal-button"><i class="fa fa-plus-circle"></i></a>"""), 'plan', 'semestre', 'matricula',
-                             'condicionado'),
-
-                    css_class="nav nav-tabs"
-                ),
-                Tab(
-                    'Documentacion y Datos Varios',
-                    Fieldset('En caso de emergencia avisar a:', 'contacto_emergencia', 'contacto_domicilio',
-                             'contacto_tel'),
-                    Fieldset('Datos Familiares',
-                             Fieldset('Datos del padre o tutor', 'nombre_tutor', 'domicilio_tutor', 'localidad_tutor',
-                                      'telefono_tutor', 'ocupacion_tutor', 'sueldo_mensual', HTML(
-                                     """<a class="btn btn-block btn-success" id='id_boton_copiar' onclick="javascript:datacopy()"><i class="fa fa-copy"></i>Copiar datos a la madre</a>""")),
-                             Fieldset('Datos de la madre', 'nombre_materno', 'domicilio_madre', 'localidad_madre',
-                                      'telefono_madre'),
-                             Fieldset('Datos generales', 'trabaja_actualmente',
-                                      Div('puesto', 'sueldo_mensual_alumno', id='div_trabajo_estudiante'))),
-                    Fieldset('Actividades', 'deporte_practica', 'credencial'),
-                    Div('oratoria', 'musica',
-                        'teatro', 'declamacion', 'otro_interes'),
-                    css_class="nav nav-tabs"
-                ),
-
-                css_class="nav-tabs-custom"
-            )
-
-        )
-
-    def clean(self):
-        cleaned_data = self.cleaned_data.copy()
-
-
-        fecha_nacimiento = cleaned_data.pop('fecha_nacimiento', None)
-        fecha_actual = timezone.now()
-
-    def save(self, force_insert=False, force_update=False, commit=True):
-        entity = super(ReinscripcionAlumnoForm, self).save(commit)
-        print('begin'+ entity.is_active.__str__())
-        entity.is_active = True
-        print("before"+entity.is_active.__str__())
-        entity.save()
-        return entity
-
-
-class PlanEstudioForm(forms.ModelForm):
-    helper = FormHelper()
-    helper.add_input(Submit('submit', 'Guardar'))
-    helper.layout = Layout(
-        'nom_plan',
-        'clave_plan',
-        'materias',
-        'is_active',
-    )
-
-    class Meta:
-        model = PlanEstudio
-        fields = '__all__'
-
-
-class GrupoForm(forms.ModelForm):
-    class Meta:
-        model = Grupos
-        fields = '__all__'
-
-
-    def __init__(self, *args, **kwargs):
-        super(GrupoForm, self).__init__(*args, **kwargs)
-        self.fields['cant_alumnos'].widget.attrs['min'] = 0
-        self.fields['actual'].widget.attrs['min'] = 0
-        self.helper = FormHelper()
-        self.helper.form_class = 'box box-success'
-        self.helper.label_class = 'form-group'
-        self.helper.add_input(Submit('submit', 'Guardar'))
-        self.helper.layout = Layout(
-            Fieldset('General','clave', 'nombre', 'cant_alumnos', 'semestre', 'actual', 'ciclo_escolar','horarios', 'plan', 'materias')
-        )
-
-
-
-class GrupoUpdateForm(forms.ModelForm):
-    class Meta:
-        model = Grupos
-        fields = '__all__'
-
-
-
-    def __init__(self, *args, **kwargs):
-        super(GrupoUpdateForm, self).__init__(*args, **kwargs)
-        self.fields['cant_alumnos'].widget.attrs['min'] = 0
-        self.fields['actual'].widget.attrs['min'] = 0
-        self.helper = FormHelper()
-        self.helper.form_class = 'box box-success'
-        self.helper.label_class = 'form-group'
-        self.helper.add_input(Submit('submit', 'Guardar'))
-        self.helper.layout = Layout(
-            Fieldset('General','clave','nombre','cant_alumnos','semestre','actual','ciclo_escolar','plan','materias','horarios'
-            )
-        )
-
-
-class HorarioForm(forms.ModelForm):
-    helper = FormHelper()
-    helper.add_input(Submit('submit', 'Guardar'))
-    helper.layout = Layout(
-        Fieldset('Adicionar Horario',
-                 'clave_horario',
-                 'nombre',
-                 'hora_inicio',
-                 'hora_termino',
-                 'minutos_inicio',
-                 'minutos_termino',
-                 'aula',
-                 'profesores',
-                 'is_active',
-                 'grupos'
-                 )
-    )
-
-    class Meta:
-        model = Horario
-        fields = '__all__'
-
-
-class MateriaForm(forms.ModelForm):
-    class Meta:
-        model = Materias
-        exclude = ("baja_date_created", "alta_date_created", "is_active")
-
-    def __init__(self, *args, **kwargs):
-        super(MateriaForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_class = 'box box-success'
-        self.helper.label_class = 'form-group'
-        self.helper.add_input(Submit('submit', 'Guardar'))
-        self.helper.add_layout(
-        Fieldset('Agregar nueva materia', 'nom_materia','clave','seriacion','creditos','semestre'
-                 ),
-
-    )
-
-
-class MaestroForm(forms.ModelForm):
-    helper = FormHelper()
-    helper.add_input(Submit('submit', 'Guardar'))
-    helper.layout = Layout(
-        Fieldset('Registro de profesor', 'nombre', 'last_name', 'no_expediente', 'email', 'foto')
-    )
-
-    class Meta:
-        model = Maestros
-        fields = '__all__'
-
-
-class CalificacionForm(forms.ModelForm):
-    helper = FormHelper()
-    helper.form_class = 'box box-success'
-    helper.label_class = 'form-group'
-    helper.add_input(Submit('submit', 'Guardar'))
-    helper.layout = Layout(
-        TabHolder(
-            Tab('Estudiante', 'matricula', 'semestre', 'plan', 'materia', 'borrado', 'tipoacreditacion', 'actualizado',
-                'login'),
-            Tab('Calificaciones', 'primera', 'status1', 'segunda','status2','tercera','status3','cuarta','status4','quinta','status5','sexta','status6','final','status_final'),
-
-            Tab('Revalidacion', 'fecha_revalidacion', 'fecha_modificacion', 'modulo'),
-            Tab('Otros', 'claveubicacion', 'id_curso', 'fecha_extraordinario')
-        )
-    )
-
-    class Meta:
-        model = Calificaciones
-        fields = '__all__'
-
-
-class CarreraForm(forms.ModelForm):
-    helper = FormHelper()
-    helper.add_layout(
-        Fieldset('Agregar nueva Carrera', 'nom_carrera', 'clave', 'abreviatura', 'plan_estudio'),
-
-    )
-
-    class Meta:
-        model = Carreras
-        fields = '__all__'
-
-
-class CarreraUpdateForm(forms.ModelForm):
-    helper = FormHelper()
-    helper.add_input(Submit('submit', 'Enviar'))
-    helper.add_layout(
-        Fieldset('Agregar nueva Carrera', 'nom_carrera', 'clave', 'abreviatura', 'plan_estudio'),
-
-    )
-
-
-class CicloSemestralForm(forms.ModelForm):
-    class Meta:
-        model = CicloSemestral
-        fields = '__all__'
-        widgets = {
-            'fecha_inicio': forms.DateInput(
-                attrs={'placeholder': 'dd/mm/aaaa', 'class': 'datepicker ui-widget ui-widget-content date-field'}),
-            'fecha_termino': forms.DateInput(
-                attrs={'placeholder': 'dd/mm/aaaa', 'class': 'datepicker ui-widget ui-widget-content date-field'}),
-            'fecha_inicio_programacion': forms.DateInput(
-                attrs={'placeholder': 'dd/mm/aaaa', 'class': 'datepicker ui-widget ui-widget-content date-field'}),
-            'fecha_fin_programacion': forms.DateInput(
-                attrs={'placeholder': 'dd/mm/aaaa', 'class': 'datepicker ui-widget ui-widget-content date-field'}),
-
-        }
-
-    def __init__(self, *args, **kwargs):
-        super(CicloSemestralForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_class = 'box box-success'
-        self.helper.label_class = 'form-group'
-        self.fields['anio'].widget.attrs['min'] = 0
-        self.fields['anio'].widget.attrs['placeholder'] = '1989'
-        self.helper.add_input(Submit('submit', 'Guardar'))
-
-        self.helper.layout = Layout(
-            Fieldset('Ciclo Semestral','clave', 'ciclo_sep', 'anio', 'periodo', 'fecha_inicio', 'fecha_termino','fecha_inicio_programacion', 'fecha_fin_programacion', 'vigente')
-
-        )
-
-
-MOTIVO_BAJA = (
-    ('Voluntaria', 'Voluntaria'),
-    ('Reprobación','Reprobación'),
-    ('Repetición','Repetición')
-
-)
-
-
-class BajasForm(forms.ModelForm):
-    class Meta:
-        model = Bajas
-        fields = '__all__'
-        exclude = ("baja_date_created", "is_active")
-
-    motivo = forms.ChoiceField(choices=MOTIVO_BAJA, widget=forms.Select(), initial='Voluntaria')
-
-
-class BibliotecaForm(forms.ModelForm):
-    class Meta:
-        model = Biblioteca
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super(BibliotecaForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_class = 'box box-success'
-        self.helper.label_class = 'form-group'
-        self.helper.add_input(Submit('submit', 'Aceptar', css_class="btn btn-success"))
-        self.helper.layout = Layout(
-            Fieldset('Deudas en Biblioteca', 'alumno', 'observacion', 'alta_date_created', 'baja_date_created',
-                     'is_active')
-        )
-
-
-class CentroComputoForm(forms.ModelForm):
-    class Meta:
-        model = CentroComputo
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super(CentroComputoForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_class = 'box box-success'
-        self.helper.label_class = 'form-group'
-        self.helper.add_input(Submit('submit', 'Aceptar', css_class="btn btn-success"))
-        self.helper.layout = Layout(
-            Fieldset('Deudas en Centro de Computo', 'alumno', 'observacion', 'alta_date_created', 'baja_date_created',
-                     'is_active')
-        )
-
-
-class ContabilidadForm(forms.ModelForm):
-    class Meta:
-        model = Contabilidad
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super(ContabilidadForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_class = 'box box-success'
-        self.helper.label_class = 'form-group'
-        self.helper.add_input(Submit('submit', 'Aceptar', css_class="btn btn-success"))
-        self.helper.layout = Layout(
-            Fieldset('Deudas en Contabilidad', 'alumno', 'observacion', 'alta_date_created', 'baja_date_created',
-                     'is_active')
-        )
-
-
-class EvaluacionForm(forms.ModelForm):
-    helper = FormHelper()
-    helper.add_input(Submit('submit', 'Aceptar', css_class='btn btn-primary btn-sm'))
-    helper.layout = Layout(
-        Fieldset('Agregar evaluacion a estudiante', 'materia', 'alumno', 'calificacion'),
-        Button(name='addEval', value='Nueva Calificacion', css_class='btn btn-success'),
-    )
+    def get_absolute_url(self):
+        return reverse('list-alumno')
+
+    def __str__(self):
+        return self.nom_alumno + " " + self.apellido_paterno + " " + self.apellido_materno
+
+
+class Extracurriculares(models.Model):
+    nom_materia = models.CharField(max_length=50, blank=True,null=True)
+    clave = models.CharField(max_length=50, blank=True,null=True, unique=True)
+    tipo = models.CharField(max_length=50, blank=True,null=True)
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.nom_materia
+
+    def get_absolute_url(self):
+        return reverse('list-extra')
+
+
+class AlumnosAsesorados(models.Model):
+    nombre = models.CharField(max_length=50, blank=True)
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Aulas(models.Model):
+    nom_aula = models.CharField(max_length=50, blank=True)
+    edificio = models.CharField(max_length=50, blank=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True, verbose_name='Activo')
+
+    def __str__(self):
+        return self.nom_aula
+
+
+class Bajas(models.Model):
+    matricula = models.ForeignKey(Alumnos,to_field='matricula',null=True,blank=True)
+    motivo = models.CharField(max_length=200, blank=True)
+    ciclo=models.ForeignKey('CicloSemestral',to_field='clave',null=True,blank=True)
+    observaciones=models.CharField(max_length=200,blank=True,null=True)
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def get_absolute_url(self):
+        return reverse('baja-add')
+
+
+class Becas(models.Model):
+    nom_beca = models.CharField(max_length=50, blank=True)
+    alumnos = models.ManyToManyField('Alumnos', blank=True, null=True)
+    tipo_beca = models.ForeignKey('TipoBeca',to_field='clave_tipo_beca')
+    limite_becas_total = models.IntegerField(blank=True, null=True, verbose_name="Limite de becas al 100%(Total)")
+    restriccion_becas = models.BooleanField(default=False, verbose_name="Restringir capturas de becas(Nuevo Ingreso)")
+    restriccion_promedios = models.BooleanField(default=False, verbose_name="Estatus de candados por promedio")
+    promedio_80_84 = models.CharField(max_length=50, blank=True,null=True)
+    promedio_85_89 = models.CharField(max_length=50, blank=True,null=True)
+    promedio_90_94 = models.CharField(max_length=50, blank=True,null=True)
+    promedio_95_100 = models.CharField(max_length=50, blank=True,null=True)
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.nom_beca
+
+    def get_absolute_url(self):
+        return reverse('list-beca')
+
+
+class TipoBeca(models.Model):
+    clave_tipo_beca = models.CharField(max_length=50, unique=True)
+    descripcion = models.CharField(max_length=250)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.clave_tipo_beca
+
+
+class CreditoEducativo(models.Model):
+    alumno = models.ForeignKey(Alumnos)
+    semestre = models.ForeignKey('CicloSemestral')
+    estado = models.SmallIntegerField(blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Cursos(models.Model):
+    nombre = models.CharField(max_length=50, blank=True)
+    hora = models.DateTimeField(blank=True, null=True)
+    instructor = models.CharField(max_length=50, blank=True,null=True)
+    personas = models.ManyToManyField("Personas", blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Divisiones(models.Model):
+    division = models.CharField(max_length=50, blank=True)
+    carreras = models.ManyToManyField('Carreras', blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Documentos(models.Model):
+    nombre = models.CharField(max_length=50, blank=True)
+    alumnos = models.ManyToManyField('Alumnos', blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Empresas(models.Model):
+    nombre = models.CharField(max_length=200, blank=True,null=True)
+    tipo = models.CharField(max_length=50, blank=True,null=True)
+    tamano = models.CharField(max_length=50, blank=True,null=True)
+    municipio = models.CharField(max_length=50, blank=True,null=True)
+    clave=models.CharField(max_length=50,unique=True,blank=True,null=True)
+    direccion=models.CharField(max_length=200, blank=True,null=True)
+    telefono=models.CharField(max_length=250, blank=True,null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class EncuestaEgresados(models.Model):
+    nombre = models.CharField(max_length=50, blank=True)
+    sexo = models.CharField(max_length=50, blank=True)
+    carrera = models.CharField(max_length=50, blank=True)
+    telefono = models.CharField(max_length=50, blank=True)
+    edad = models.CharField(max_length=50, blank=True)
+    correo_electronico = models.CharField(max_length=50, blank=True)
+    estado_civil = models.CharField(max_length=50, blank=True)
+    preg_9 = models.CharField(max_length=50, blank=True)
+    porque_preg_9 = models.CharField(max_length=50, blank=True)
+    preg_10 = models.CharField(max_length=50, blank=True)
+    preg_11 = models.CharField(max_length=50, blank=True)
+    preg_12 = models.CharField(max_length=50, blank=True)
+    preg_13 = models.CharField(max_length=50, blank=True)
+    porque_preg_13 = models.CharField(max_length=200, blank=True)
+    preg_14 = models.CharField(max_length=50, blank=True)
+    porque_preg_14 = models.CharField(max_length=200, blank=True)
+    preg_15 = models.CharField(max_length=50, blank=True)
+    preg_16 = models.CharField(max_length=100, blank=True)
+    preg_17 = models.CharField(max_length=50, blank=True)
+    preg_18 = models.CharField(max_length=200, blank=True)
+    preg_19 = models.CharField(max_length=50, blank=True)
+    preg_20 = models.CharField(max_length=100, blank=True)
+    preg_21_1 = models.CharField(max_length=50, blank=True)
+    preg_21_2 = models.CharField(max_length=50, blank=True)
+    preg_21_3 = models.CharField(max_length=50, blank=True)
+    preg_21_4 = models.CharField(max_length=50, blank=True)
+    preg_21_5 = models.CharField(max_length=50, blank=True)
+    preg_21_6 = models.CharField(max_length=50, blank=True)
+    preg_21_7 = models.CharField(max_length=50, blank=True)
+    preg_21_8 = models.CharField(max_length=50, blank=True)
+    preg_21_9 = models.CharField(max_length=50, blank=True)
+    preg_21_10 = models.CharField(max_length=50, blank=True)
+    preg_22 = models.CharField(max_length=50, blank=True)
+    preg_23 = models.CharField(max_length=50, blank=True)
+    preg_24 = models.CharField(max_length=50, blank=True)
+    preg_25 = models.CharField(max_length=50, blank=True)
+    preg_26 = models.CharField(max_length=50, blank=True)
+    preg_27 = models.CharField(max_length=50, blank=True)
+    preg_28 = models.CharField(max_length=50, blank=True)
+    porque_preg_28 = models.CharField(max_length=200, blank=True)
+    preg_29 = models.CharField(max_length=50, blank=True)
+    preg_30 = models.CharField(max_length=50, blank=True)
+    porque_preg_30 = models.CharField(max_length=200, blank=True)
+    preg_31_1 = models.CharField(max_length=50, blank=True)
+    preg_31_2 = models.CharField(max_length=50, blank=True)
+    preg_31_3 = models.CharField(max_length=50, blank=True)
+    preg_31_4 = models.CharField(max_length=50, blank=True)
+    preg_31_5 = models.CharField(max_length=50, blank=True)
+    preg_31_6 = models.CharField(max_length=50, blank=True)
+    preg_31_7 = models.CharField(max_length=50, blank=True)
+    preg_31_8 = models.CharField(max_length=50, blank=True)
+    preg_31_9 = models.CharField(max_length=50, blank=True)
+    preg_31_10 = models.CharField(max_length=50, blank=True)
+    preg_31_11 = models.CharField(max_length=50, blank=True)
+    porque_preg_31_1 = models.CharField(max_length=50, blank=True)
+    porque_preg_31_2 = models.CharField(max_length=50, blank=True)
+    preg_32 = models.CharField(max_length=50, blank=True)
+    preg_33_1 = models.CharField(max_length=50, blank=True)
+    preg_33_2 = models.CharField(max_length=50, blank=True)
+    preg_33_3 = models.CharField(max_length=50, blank=True)
+    preg_33_4 = models.CharField(max_length=50, blank=True)
+    preg_34_1 = models.CharField(max_length=50, blank=True)
+    preg_34_2 = models.CharField(max_length=50, blank=True)
+    preg_34_3 = models.CharField(max_length=50, blank=True)
+    preg_34_4 = models.CharField(max_length=50, blank=True)
+    preg_34_5 = models.CharField(max_length=50, blank=True)
+    preg_34_6 = models.CharField(max_length=50, blank=True)
+    preg_34_7 = models.CharField(max_length=50, blank=True)
+    preg_34_8 = models.CharField(max_length=50, blank=True)
+    preg_34_9 = models.CharField(max_length=50, blank=True)
+    preg_34_10 = models.CharField(max_length=50, blank=True)
+    preg_34_11 = models.CharField(max_length=50, blank=True)
+    preg_34_12 = models.CharField(max_length=50, blank=True)
+    preg_35_1 = models.CharField(max_length=50, blank=True)
+    preg_35_2 = models.CharField(max_length=50, blank=True)
+    preg_35_3 = models.CharField(max_length=50, blank=True)
+    preg_35_4 = models.CharField(max_length=50, blank=True)
+    preg_36 = models.CharField(max_length=200, blank=True)
+    preg_37 = models.CharField(max_length=200, blank=True)
+    preg_38_1 = models.CharField(max_length=50, blank=True)
+    preg_38_2 = models.CharField(max_length=50, blank=True)
+    preg_38_3 = models.CharField(max_length=50, blank=True)
+    preg_38_4 = models.CharField(max_length=50, blank=True)
+    preg_38_5 = models.CharField(max_length=50, blank=True)
+    preg_39 = models.CharField(max_length=100, blank=True)
+    preg_40 = models.CharField(max_length=50, blank=True)
+    preg_41 = models.CharField(max_length=50, blank=True)
+    porque_preg_41 = models.CharField(max_length=200, blank=True)
+    preg_42 = models.CharField(max_length=50, blank=True)
+    porque_preg_42 = models.CharField(max_length=200, blank=True)
+    comentarios = models.CharField(max_length=200, blank=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class EncuestaEmpleador(models.Model):
+    empresa = models.CharField(max_length=50, blank=True)
+    responsable = models.CharField(max_length=50, blank=True)
+    puesto = models.CharField(max_length=50, blank=True)
+    telefono = models.CharField(max_length=50, blank=True)
+    correo = models.CharField(max_length=50, blank=True)
+    preg_2 = models.CharField(max_length=50, blank=True)
+    preg_3 = models.CharField(max_length=50, blank=True)
+    preg_4 = models.CharField(max_length=50, blank=True)
+    porque_preg_4 = models.CharField(max_length=50, blank=True)
+    preg_5 = models.CharField(max_length=200, blank=True)
+    preg_6 = models.CharField(max_length=200, blank=True)
+    preg_7 = models.CharField(max_length=200, blank=True)
+    preg_8_1 = models.CharField(max_length=50, blank=True)
+    preg_8_2 = models.CharField(max_length=50, blank=True)
+    preg_8_3 = models.CharField(max_length=50, blank=True)
+    preg_8_4 = models.CharField(max_length=50, blank=True)
+    preg_8_5 = models.CharField(max_length=50, blank=True)
+    preg_8_6 = models.CharField(max_length=50, blank=True)
+    preg_8_7 = models.CharField(max_length=50, blank=True)
+    preg_8_8 = models.CharField(max_length=50, blank=True)
+    preg_8_9 = models.CharField(max_length=50, blank=True)
+    preg_8_10 = models.CharField(max_length=50, blank=True)
+    preg_8_11 = models.CharField(max_length=50, blank=True)
+    preg_8_12 = models.CharField(max_length=50, blank=True)
+    preg_8_13 = models.CharField(max_length=50, blank=True)
+    preg_8_14 = models.CharField(max_length=50, blank=True)
+    preg_8_15 = models.CharField(max_length=50, blank=True)
+    preg_8_16 = models.CharField(max_length=50, blank=True)
+    preg_8_17 = models.CharField(max_length=50, blank=True)
+    preg_8_18 = models.CharField(max_length=50, blank=True)
+    preg_8_19 = models.CharField(max_length=50, blank=True)
+    preg_8_20 = models.CharField(max_length=50, blank=True)
+    preg_8_21 = models.CharField(max_length=50, blank=True)
+    preg_8_22 = models.CharField(max_length=50, blank=True)
+    preg_9 = models.CharField(max_length=200, blank=True)
+    preg_10_1 = models.CharField(max_length=50, blank=True)
+    preg_10_2 = models.CharField(max_length=50, blank=True)
+    preg_10_3 = models.CharField(max_length=50, blank=True)
+    preg_11 = models.CharField(max_length=200, blank=True)
+    preg_12 = models.CharField(max_length=200, blank=True)
+    preg_13 = models.CharField(max_length=50, blank=True)
+    porque_preg_13 = models.CharField(max_length=200, blank=True)
+    preg_14 = models.CharField(max_length=200, blank=True)
+    comentarios = models.CharField(max_length=200, blank=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class EntregaDocumentos(models.Model):
+    alumno = models.ForeignKey(Alumnos)
+    acta_nacimiento = models.SmallIntegerField(blank=True, null=True)
+    certificado_bachillerato = models.SmallIntegerField(blank=True, null=True)
+    certificado_final = models.SmallIntegerField(blank=True, null=True)
+    constancia_final = models.SmallIntegerField(blank=True, null=True)
+    constancia_servicio = models.SmallIntegerField(blank=True, null=True)
+    curp = models.SmallIntegerField(blank=True, null=True)
+    actividades_extracurriculares = models.SmallIntegerField(blank=True, null=True)
+    fotografia_titulo = models.SmallIntegerField(blank=True, null=True)
+    fotografia_certificado = models.SmallIntegerField(blank=True, null=True)
+    fotografia_infantil = models.SmallIntegerField(blank=True, null=True)
+    registro_cedula = models.SmallIntegerField(blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Equipos(models.Model):
+    num_serie = models.CharField(max_length=50, blank=True)
+    nombre = models.CharField(max_length=50, blank=True)
+    laboratorio = models.ForeignKey('LaboratorioComputo', blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Estados(models.Model):
+    nom_estado = models.CharField(max_length=50, blank=True)
+    clave = models.CharField(max_length=50, blank=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True, verbose_name="activo")
 
     class Meta:
-        model = Evaluacion
-        fields = '__all__'
+        ordering = ["nom_estado"]
+
+    def __str__(self):
+        return self.nom_estado
 
 
-widget_text_area = forms.CharField(max_length=250, widget=forms.Textarea(
-    attrs={'rows': '4', 'cols': '30', 'class': 'form-control'}))
+class Estatus(models.Model):
+    nombre = models.CharField(max_length=50, blank=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
 
 
-class EncuestaForm(forms.ModelForm):
-    class Meta:
-        model = EncuestaEgresados
-        exclude = ("baja_date_created", "alta_date_created", "is_active")
+class ExtraHorario(models.Model):
+    extracurricular = models.ForeignKey('Extracurriculares')
+    lunes_hora = models.DateTimeField(blank=True, null=True)
+    martes_hora = models.DateTimeField(blank=True, null=True)
+    miercoles_hora = models.DateTimeField(blank=True, null=True)
+    jueves_hora = models.DateTimeField(blank=True, null=True)
+    viernes_hora = models.DateTimeField(blank=True, null=True)
+    lunes_duracion = models.DateTimeField(blank=True, null=True)
+    martes_duracion = models.DateTimeField(blank=True, null=True)
+    miercoles_duracion = models.DateTimeField(blank=True, null=True)
+    jueves_duracion = models.DateTimeField(blank=True, null=True)
+    viernes_duracion = models.DateTimeField(blank=True, null=True)
+    id_maestro = models.BigIntegerField(blank=True, null=True)
+    nom_horario = models.CharField(max_length=50, blank=True)
+    periodo = models.CharField(max_length=50, blank=True)
 
-    sexo = forms.ChoiceField(choices=GENERO_SELECT,
-                             widget=forms.Select(), required=False)
-
-    estado_civil = forms.ChoiceField(choices=Estado_Civil,
-                                     widget=forms.Select(), required=False, label='Estado Civil')
-    comentarios = widget_text_area
-
-    def __init__(self, *args, **kwargs):
-        super(EncuestaForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_class = 'box box-success'
-        self.helper.label_class = 'form-group'
-        self.helper.add_input(Submit('submit', 'Guardar', css_class='btn btn-primary'))
-        self.helper.layout = Layout(
-            TabHolder(
-                Tab('Datos Personales', 'nombre', 'sexo', 'carrera', 'telefono', 'edad', 'correo_electronico',
-                    'estado_civil'),
-                Tab('Cuestionario 1', 'preg_9', 'porque_preg_9', 'preg_10', 'preg_11', 'preg_12', 'preg_13',
-                    ' porque_preg_13 ', 'preg_14', 'porque_preg_14 ', 'preg_15', 'preg_16', 'preg_17', 'preg_18',
-                    ' preg_19', 'preg_20'),
-                Tab('Cuestionario 2', 'preg_21_1', 'preg_21_2', 'preg_21_3', 'preg_21_4', 'preg_21_5', 'preg_21_6',
-                    'preg_21_7', 'preg_21_8', 'preg_21_9', 'preg_21_10', 'preg_22', ' preg_23', 'preg_24', 'preg_25',
-                    'preg_26', 'preg_27', 'preg_28', 'porque_preg_28', 'preg_29'),
-                Tab('Cuestionario 3', 'preg_30', 'porque_preg_30', 'preg_31_1', 'preg_31_2 ', 'preg_31_3', 'preg_31_4 ',
-                    'preg_31_5', 'preg_31_6 ',
-                    'preg_31_7 ',
-                    'preg_31_8',
-                    'preg_31_9',
-                    'preg_31_10',
-                    'preg_31_11',
-                    'porque_preg_31_1 ',
-                    'porque_preg_31_2 ',
-                    'preg_32 ',
-                    'preg_33_1 ',
-                    'preg_33_2',
-                    'preg_33_3',
-                    'preg_33_4',
-                    'preg_34_1',
-                    'preg_34_2',
-                    'preg_34_3',
-                    'preg_34_4',
-                    'preg_34_5 ',
-                    'preg_34_6 ',
-                    'preg_34_7 ',
-                    'preg_34_8',
-                    'preg_34_9',
-                    'preg_34_10 ',
-                    'preg_34_11',
-                    'preg_34_12',
-                    'preg_35_1',
-                    'preg_35_2 ',
-                    'preg_35_3',
-                    'preg_35_4',
-                    'preg_36',
-                    'preg_37',
-                    'preg_38_1',
-                    'preg_38_2 ',
-                    'preg_38_3 ',
-                    'preg_38_4',
-                    'preg_38_5',
-                    'preg_39',
-                    ),
-                Tab('Cuestionario 4', 'preg_40',
-                    'preg_41',
-                    'porque_preg_41',
-                    'preg_42',
-                    'porque_preg_42'),
-                Tab('Comentarios Finales', 'comentarios')
-            )
-        )
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
 
 
-class MunicipioForm(forms.ModelForm):
-    helper = FormHelper()
-    helper.layout = Layout(
-        'estado', 'nom_municipio', 'is_active'
+class Grupos(models.Model):
+    clave = models.CharField(max_length=50,blank=True,unique=True)
+    nombre = models.CharField(max_length=50, blank=True)
+    cant_alumnos = models.IntegerField(blank=True, null=True)
+    semestre = models.ForeignKey("CicloSemestral",to_field='clave',blank=True,null=True)
+    #carrera = models.ForeignKey('Carreras',to_field='clave',blank=True,null=True)
+    actual = models.SmallIntegerField(blank=True, null=True)
+    ciclo_escolar = models.CharField(max_length=50, blank=True)
+    plan = models.ForeignKey('PlanEstudio',to_field='clave_plan',blank=True, null=True)
+    #el plan tiene las materias
+    #materias = models.ManyToManyField("Materias", blank=True, null=True)
+    # maestros = models.ManyToManyField("Maestros", blank=True, null=True)
 
-    )
+    # nuevos campos
+    #horario = models.ForeignKey("Horario", blank=True, null=True)
+    horarios = models.ManyToManyField("Horario", blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
-        model = Municipios
-        fields = '__all__'
+        ordering = ["nombre"]
+
+    def get_absolute_url(self):
+        return reverse('list-grupos')
+
+    def __str__(self):
+        return self.clave
 
 
-class AulaForm(forms.ModelForm):
-    helper = FormHelper()
-    helper.layout = Layout(
-        'nom_aula', 'edificio', 'is_active'
-    )
+class Horario(models.Model):
+    clave_horario = models.CharField(max_length=20, blank=True, null=True)
+    nombre = models.CharField(max_length=20, blank=True, null=True)
+    hora_inicio = models.CharField(max_length=2, blank=True, null=True)
+    hora_termino = models.CharField(max_length=2, blank=True, null=True)
+    minutos_inicio = models.CharField(max_length=2, blank=True, null=True)
+    minutos_termino = models.CharField(max_length=2, blank=True, null=True)
+    aula = models.ForeignKey('Aulas', blank=True, null=True)
+    profesores = models.ForeignKey('Maestros', blank=True, null=True)
 
-    class Meta:
-        model = Aulas
-        fields = '__all__'
+    alta_date_created = models.DateTimeField(auto_now_add=True, verbose_name="Fecha")
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True, verbose_name="activo")
 
-
-class EstadoForm(forms.ModelForm):
-    helper = FormHelper()
-    helper.layout = Layout(
-        'nom_estado', 'clave', 'is_active'
-
-    )
-
-    class Meta:
-        model = Estados
-        fields = '__all__'
-
-
-# listas
-
-class listaAlumnosForm(forms.ModelForm):
-    class Meta:
-        model = Alumnos
-        fields = ('id', 'no_expediente', 'apellido_paterno', 'apellido_materno', 'nom_alumno', 'semestre')
-
-
-class listaGruposForm(forms.ModelForm):
-    class Meta:
-        model = Grupos
-        fields = '__all__'
-
-
-class ConsultaAlumnosListForm(forms.Form):
-    plan = forms.ModelChoiceField(queryset=mixins.getPlanListado(),
-                                  widget=forms.Select(attrs={'class': 'form-control'}), required=False)
-
-    semestre = forms.ModelChoiceField(queryset=mixins.getCicloSemestral(), widget=forms.Select(), required=False)
-
-    expediente = forms.CharField(label='expediente', min_length=9, max_length=9, required=False,
-                                 widget=forms.TextInput(
-                                     attrs={'placeholder': "No_Expediente", 'class': 'form-control'}))
-    nombre = forms.CharField(label='nombre', min_length=9, max_length=9, required=False,
-                             widget=forms.TextInput(attrs={'placeholder': "Nombre", 'class': 'form-control'}))
-    apellido_paterno = forms.CharField(label='apellido Paterno', min_length=9, max_length=9, required=False,
-                                       widget=forms.TextInput(
-                                           attrs={'placeholder': "Apellido", 'class': 'form-control'}))
-    apellido_materno = forms.CharField(label='apellido Materno', min_length=9, max_length=9, required=False,
-                                       widget=forms.TextInput(
-                                           attrs={'placeholder': "Apellido", 'class': 'form-control'}))
-
-
-class ConsultaCicloSemestralListForm(forms.Form):
-    clave = forms.CharField(label='Clave', min_length=9, max_length=9, required=False,
-                            widget=forms.TextInput(attrs={'placeholder': "2020-01", 'class': 'form-control'}))
-    cicloSep = forms.CharField(label='Ciclo SEP', min_length=9, max_length=9, required=False,
-                               widget=forms.TextInput(attrs={'placeholder': "1-2", 'class': 'form-control'}))
-
-    anio = forms.CharField(label='Año', min_length=9, max_length=9, required=False,
-                           widget=forms.TextInput(attrs={'placeholder': "2020", 'class': 'form-control'}))
-    periodo = forms.CharField(label='Periodo', min_length=9, max_length=9, required=False,
-                              widget=forms.TextInput(attrs={'placeholder': "1", 'class': 'form-control'}))
-
-
-class ConsultaExtracurricularListForm(forms.Form):
-    clave = forms.CharField(label='Clave Extracurricular', max_length=15, required=False,
-                            widget=forms.TextInput(attrs={'placeholder': "2020-01", 'class': 'form-control'}))
-    nombre = forms.CharField(label='Nombre', min_length=9, max_length=9, required=False)
-
-
-class ServicioSocialForm(forms.ModelForm):
-    class Meta:
-        model = ServicioHoras
-        fields = '__all__'
-
-    # alumno = forms.ModelChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), required=False)
-
-    def __init__(self, *args, **kwargs):
-        super(ServicioSocialForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_class = 'box box-success'
-        self.helper.label_class = 'form-group'
-        self.helper.layout = Layout(
-            'alumno', 'proyecto', 'horas', 'is_active'
-        )
-
-
-# class ServicioSocialForm(forms.ModelForm):
-#      alumno = forms.ModelChoiceField(queryset=mixins.getEstudiantesPuedenSS(),
-#                                   widget=forms.Select(attrs={'class': 'form-control'}), required=True)
-#
-#      proyecto=forms.ModelChoiceField(queryset=mixins.getEmpresas(),
-#                                   widget=forms.Select(attrs={'class': 'form-control'}), required=True)
-#
-#      horas = forms.CharField(label='Horas', min_length=9, max_length=9, required=False,
-#                                widget=forms.TextInput(attrs={'placeholder': "24", 'class': 'form-control'}))
-#
-#      class Meta:
-#         model = ServicioHoras
-#         fields = '__all__'
-
-
-class BecasForm(forms.ModelForm):
-    class Meta:
-        model = Becas
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super(BecasForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_class = 'box box-success'
-        self.helper.label_class = 'form-group'
-        self.helper.layout = Layout(
-            Fieldset('Becas', 'nom_beca', 'tipo_beca', 'alumnos'),
-            'restriccion_becas', 'limite_becas_total',
-            'restriccion_promedios',
-            Fieldset('Promedios', 'promedio_80_84', 'promedio_85_89', 'promedio_90_94', 'promedio_95_100'
-
-                     ),
-            'alta_date_created', 'baja_date_created', ' is_active'
-        )
-
-
-class TiposBecasForm(forms.ModelForm):
-    helper = FormHelper()
-    helper.layout = Layout(
-        'clave_tipo_beca', 'descripcion', 'is_active'
-
-    )
+    def __str__(self):
+        return self.nombre
 
     class Meta:
-        model = TipoBeca
-        fields = '__all__'
+        ordering = ["aula"]
+
+    def get_absolute_url(self):
+        return reverse('list-horario')
 
 
-class EscuelaForm(forms.ModelForm):
+class Inscripciones(models.Model):
+    alumno = models.ForeignKey('Alumnos')
+    semestre = models.ForeignKey('CicloSemestral')
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Jefes(models.Model):
+    nom_jefe = models.CharField(max_length=50, blank=True)
+    puesto = models.CharField(max_length=50, blank=True)
+    firma = models.BinaryField(blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class JefesDivision(models.Model):
+    nombre = models.CharField(max_length=50, blank=True)
+    division = models.ForeignKey('Divisiones')
+    usuario = models.ForeignKey('Usuarios', blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class LaboratorioComputo(models.Model):
+    nom_laboratorio = models.CharField(max_length=50, blank=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class LiberacionDocumentos(models.Model):
+    acta_nacimiento = models.SmallIntegerField(blank=True, null=True)
+    certificado_bachillerato = models.SmallIntegerField(blank=True, null=True)
+    certificado_final = models.SmallIntegerField(blank=True, null=True)
+    constancia_final = models.SmallIntegerField(blank=True, null=True)
+    constancia_servicio = models.SmallIntegerField(blank=True, null=True)
+    curp = models.SmallIntegerField(blank=True, null=True)
+    alumno = models.ForeignKey('Alumnos')
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Maestros(models.Model):
+    nombre = models.CharField(max_length=50, blank=True, verbose_name='Nombre')
+    last_name = models.CharField(max_length=100, blank=True, verbose_name='Apellido')
+    no_expediente = models.CharField(max_length=50, blank=False, verbose_name='Numero de Empleado', unique=True)
+    email = models.EmailField(default='email@email.com',unique=True)
+    foto = models.ImageField(upload_to='fotos', blank=True , verbose_name='Foto', default='foto.png')
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
     class Meta:
-        model = Escuela
-        exclude = ("baja_date_created", "alta_date_created", "is_active")
+        ordering = ["nombre"]
 
-    def __init__(self, *args, **kwargs):
-        super(EscuelaForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_class = 'box box-success'
-        self.helper.label_class = 'form-group'
+    def get_absolute_url(self):
+        return reverse('list-maestro')
 
-class SemestreForm(forms.ModelForm):
+    def __str__(self):
+        return self.nombre
+
+
+class Municipios(models.Model):
+    nom_municipio = models.CharField(max_length=50, blank=True)
+    estado = models.ForeignKey('Estados',blank=True,null=True)
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.nom_municipio
+
+
+class Personas(models.Model):
+    nom_persona = models.CharField(max_length=50, blank=True)
+    edad = models.IntegerField(blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class PlanEstudio(models.Model):
+    nom_plan = models.CharField(max_length=50, blank=True)
+    clave_plan = models.CharField(max_length=50, blank=True, unique=True)
+    materias = models.ManyToManyField("Materias", blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.clave_plan
+
     class Meta:
-        model = Semestre
-        fields = '__all__'
-        exclude=('alta_date_created','baja_date_created','is_active')
+        ordering = ["nom_plan"]
+
+    def get_absolute_url(self):
+        return reverse('list-planEstudio')
 
 
-    def __init__(self, *args, **kwargs):
-        super(SemestreForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_class = 'box box-success'
-        self.helper.label_class = 'form-group'
-        self.helper.add_input(Submit('submit', 'Guardar'))
-        self.helper.layout = Layout(
-            Fieldset('Agregar Semestre','ciclo_semestral', 'clave')
-        )
+class Privilegios(models.Model):
+    privilegio = models.CharField(max_length=50, blank=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class ProgramacionExamen(models.Model):
+    alumno = models.ForeignKey('Alumnos')
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class ReservacionAlumno(models.Model):
+    alumno = models.BigIntegerField(blank=True, null=True)
+    equipo = models.BigIntegerField(blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class ReservacionMaestroEsporadico(models.Model):
+    maestro = models.ForeignKey('Maestros', blank=True, null=True)
+    laboratorio = models.ForeignKey('LaboratorioComputo', blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class ReservacionMaestroFijo(models.Model):
+    maestro = models.ForeignKey('Maestros', blank=True, null=True)
+    laboratorio = models.ForeignKey('LaboratorioComputo', blank=True, null=True)
+    hora_lunes_inicio = models.DateTimeField(blank=True, null=True)
+    hora_martes_inicio = models.DateTimeField(blank=True, null=True)
+    hora_miercoles_inicio = models.DateTimeField(blank=True, null=True)
+    hora_jueves_inicio = models.DateTimeField(blank=True, null=True)
+    hora_viernes_inicio = models.DateTimeField(blank=True, null=True)
+    hora_lunes_fin = models.DateTimeField(blank=True, null=True)
+    hora_martes_fin = models.DateTimeField(blank=True, null=True)
+    hora_miercoles_fin = models.DateTimeField(blank=True, null=True)
+    hora_jueves_fin = models.DateTimeField(blank=True, null=True)
+    hora_viernes_fin = models.DateTimeField(blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Revalidaciones(models.Model):
+    alumno = models.ForeignKey('Alumnos')
+    tipo = models.CharField(max_length=50, blank=True)
+    materia = models.ForeignKey('Materias')
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class ServicioEstadia(models.Model):
+    nombre = models.CharField(max_length=50, blank=True)
+    asesor_interno = models.CharField(max_length=50, blank=True)
+    asesor_externo = models.CharField(max_length=50, blank=True)
+    empresa = models.ForeignKey('Empresas')
+    tipo = models.CharField(max_length=50, blank=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.nombre
+
+
+class ServicioHoras(models.Model):
+    alumno = models.ForeignKey('Alumnos',unique=True)
+    proyecto = models.ForeignKey('ServicioEstadia')
+    horas = models.IntegerField(blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True, verbose_name='liberar')
+
+    def __str__(self):
+        return self.proyecto.nombre
+
+    def get_absolute_url(self):
+        return reverse('list-servicio')
+
+
+class Servicios(models.Model):
+    nombre = models.CharField(max_length=50, blank=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class SolicitudBeca(models.Model):
+    beca = models.ForeignKey('Becas')
+    alumno = models.ForeignKey('Alumnos')
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Sysdiagrams(models.Model):
+    name = models.CharField(max_length=1)
+    principal = models.IntegerField()
+    version = models.IntegerField(blank=True, null=True)
+    definition = models.BinaryField(blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class TemasTitulo(models.Model):
+    nombre = models.CharField(max_length=50, blank=True)
+    alumno = models.ForeignKey('Alumnos')
+    aceptado = models.SmallIntegerField(blank=True, null=True)
+    asesor = models.CharField(max_length=50, blank=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Titulos(models.Model):
+    tema = models.ForeignKey('TemasTitulo')
+    hora_inicio = models.DateTimeField(blank=True, null=True)
+    hora_fin = models.DateTimeField(blank=True, null=True)
+    dictamen = models.CharField(max_length=50, blank=True)
+    no_foja = models.IntegerField(blank=True, null=True)
+    tipo_folio = models.CharField(max_length=50, blank=True)
+    no_libro = models.CharField(max_length=50, blank=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class TmpAlumnoServicio(models.Model):
+    alumno = models.ForeignKey('Alumnos', blank=True, null=True)
+    horas = models.IntegerField(blank=True, null=True)
+    user = models.ForeignKey('Usuarios', blank=True, null=True)
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class TmpAlumnosEstadias(models.Model):
+    alumno = models.ForeignKey('Alumnos', blank=True, null=True)
+    user = models.ForeignKey('Usuarios', blank=True, null=True)
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Tramites(models.Model):
+    alumno = models.ForeignKey('Alumnos')
+    estatus = models.ForeignKey('Estatus')
+    servicio = models.ForeignKey('Servicios')
+    monto = models.DecimalField(max_digits=18, decimal_places=2, blank=True, null=True)
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Usuarios(models.Model):
+    usuario = models.CharField(max_length=50, blank=True)
+    password = models.CharField(max_length=100, blank=True)
+    privilegio = models.ForeignKey('Privilegios')
+    maestro = models.ForeignKey('Maestros')
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class UsuariosLab(models.Model):
+    usuario = models.CharField(max_length=50, blank=True)
+    password = models.CharField(max_length=50, blank=True)
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class Evaluacion(models.Model):
+    materia = models.ForeignKey('Materias')
+    alumno = models.ForeignKey('Alumnos')
+    calificacion = models.ForeignKey('AlumnoCalificacion')
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def get_absolute_url(self):
+        return reverse('list-evaluacion')
+
+class Semestre(models.Model):
+    ciclo_semestral=models.ForeignKey('CicloSemestral',to_field='clave')
+    clave = models.CharField(max_length=50,blank=True,unique=True)
+
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def get_absolute_url(self):
+        return reverse('list-sem')
+
+class CicloSemestral(models.Model):
+    clave = models.CharField(max_length=50,blank=True,unique=True)
+    ciclo_sep = models.CharField(max_length=50, blank=True, verbose_name='Ciclo SEP')
+    anio = models.IntegerField(blank=True, null=True, verbose_name="Año")
+    periodo = models.IntegerField(blank=True, null=True)
+    fecha_inicio = models.DateTimeField(blank=True, null=True)
+    fecha_termino = models.DateTimeField(blank=True, null=True)
+    vigente = models.BooleanField(default=False)
+
+    fecha_inicio_programacion = models.DateTimeField(blank=True, null=True)
+    fecha_fin_programacion = models.DateTimeField(blank=True, null=True)
+
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["clave"]
+
+    def get_absolute_url(self):
+        return reverse('list-semestre')
+
+    def __str__(self):
+        return self.clave
+
+
+class Biblioteca(models.Model):
+    alumno = models.ForeignKey('Alumnos', unique=True)
+    observacion = models.CharField(max_length=250,blank=True, null=True, verbose_name="Observaciones")
+
+    alta_date_created = models.DateTimeField(verbose_name='Alta de adeudo',blank=True, null=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True, verbose_name='Baja de adeudo')
+    is_active = models.BooleanField(default=True, verbose_name='Deuda Activa')
+
+    def get_absolute_url(self):
+        return reverse('list-biblio')
+
+    def __str__(self):
+        return "Deuda Biblioteca #"+self.id.__str__()
+
+
+
+class CentroComputo(models.Model):
+    alumno = models.ForeignKey('Alumnos', unique=True)
+    observacion = models.CharField(max_length=250,blank=True, null=True, verbose_name="Observaciones")
+
+    alta_date_created = models.DateTimeField(verbose_name='Alta de adeudo',blank=True, null=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True, verbose_name='Baja de adeudo')
+    is_active = models.BooleanField(default=True,verbose_name='Deuda Activa')
+
+    def __str__(self):
+        return "Deuda CC #"+self.id.__str__()
+
+    def get_absolute_url(self):
+        return reverse('list-cc')
+
+class Contabilidad(models.Model):
+    alumno = models.ForeignKey('Alumnos', unique=True)
+    observacion = models.CharField(max_length=250,blank=True, null=True, verbose_name="Observaciones")
+
+    alta_date_created = models.DateTimeField(verbose_name='Alta de adeudo')
+    baja_date_created = models.DateTimeField(blank=True, null=True, verbose_name='Baja de adeudo')
+    is_active = models.BooleanField(default=True,verbose_name='Deuda Activa')
+
+    def __str__(self):
+        return "Deuda Contabilidad #"+self.id__str__()
+
+    def get_absolute_url(self):
+        return reverse('list-conta')
+
+class Escuela(models.Model):
+    estado=models.ForeignKey('Estados')
+    localidad=models.CharField(max_length=50, blank=True, null=True)
+    nombre=models.CharField(max_length=100)
+    alta_date_created = models.DateTimeField(auto_now_add=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+    def get_absolute_url(self):
+        return reverse('alumno-add')
+
+    def __str__(self):
+        return self.nombre
+
+class Calificaciones(models.Model):
+
+    #carrera?
+    materia = models.ForeignKey(Materias,to_field='clave',null=True)
+    matricula = models.ForeignKey(Alumnos,to_field='matricula',null=True)
+    semestre = models.ForeignKey(CicloSemestral,to_field='clave',null=True)
+    plan = models.ForeignKey(PlanEstudio,to_field='clave_plan',null=True)
+
+
+    primera = models.DecimalField(max_digits=3, decimal_places=0, blank=True, verbose_name='1ra Calificacion', null=True, )
+    status1 = models.IntegerField(blank=True, null=True, verbose_name='Status')
+
+    segunda = models.DecimalField(max_digits=3, decimal_places=0, blank=True, verbose_name='2da Calificacion', null=True, )
+    status2 = models.IntegerField(blank=True, verbose_name='Status', null=True)
+
+    tercera = models.DecimalField(max_digits=3, decimal_places=0, blank=True, verbose_name='3ra Calificacion',null=True, )
+    status3 = models.IntegerField(blank=True, verbose_name='Status', null=True, )
+
+    cuarta = models.DecimalField(max_digits=3, decimal_places=0, blank=True, verbose_name='4ta Calificacion',null=True, )
+    status4 = models.IntegerField(blank=True, verbose_name='Status', null=True, )
+
+    quinta = models.DecimalField(max_digits=3, decimal_places=0, blank=True, verbose_name='5ta Calificacion', null=True, )
+    status5 = models.IntegerField(blank=True, verbose_name='Status', null=True, )
+
+    sexta = models.DecimalField(max_digits=3, decimal_places=0, blank=True, verbose_name='6ta Calificacion',null=True, )
+    status6 = models.IntegerField(blank=True, verbose_name='Status', null=True, )
+
+    final = models.DecimalField(max_digits=3, decimal_places=0, blank=True, verbose_name='Calificacion Final',null=True, )
+    status_final = models.IntegerField(blank=True, verbose_name='Status', null=True, )
+
+    borrado = models.IntegerField(blank=True, null=True, )
+    tipoacreditacion = models.IntegerField(blank=True, null=True, )
+    actualizado = models.DateTimeField(blank=True, null=True, )
+    fecha_revalidacion = models.DateTimeField(blank=True, null=True, )
+    fecha_modificacion = models.DateTimeField(blank=True, null=True,auto_now_add=True )
+    modulo = models.IntegerField(blank=True, null=True, )
+    login = models.CharField(max_length=20, blank=True, null=True, )
+
+
+    claveubicacion = models.CharField(max_length=10, blank=True, null=True, )
+    id_curso = models.IntegerField(blank=True, null=True, )
+    fecha_extraordinario = models.DateTimeField(blank=True, null=True, )
+
+    alta_date_created = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    baja_date_created = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def get_absolute_url(self):
+        return reverse('list-calificacion')
+
+    def __str__(self):
+        return self.matricula + self.materia
