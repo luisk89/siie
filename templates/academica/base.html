@@ -217,9 +217,15 @@ desired effect
     });
 
 </script>
+
 <script>
+
     $(document).ready(function () {
-        $('.datepicker').datepicker();
+        $('#id_fecha_nacimiento').datepicker({
+            autoclose: true ,
+            format: 'dd/mm/yyyy',
+
+        });
     });
 </script>
 

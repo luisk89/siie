@@ -75,7 +75,7 @@ class AlumnosForm(forms.ModelForm):
         model = Alumnos
         fields = '__all__'
         widgets = {
-            'fecha_nacimiento': forms.DateInput(attrs={'placeholder': 'dd/mm/aaaa','class': 'datepicker ui-widget ui-widget-content date-field'}),
+            'fecha_nacimiento': forms.DateInput(attrs={'placeholder': 'dd/mm/aaaa', 'class': 'datepicker ui-widget ui-widget-content date-field'}),
         }
 
 
@@ -92,7 +92,7 @@ class AlumnosForm(forms.ModelForm):
     tipo_sangre = forms.ChoiceField(choices=Sangre_select,
                                     widget=forms.Select(), required=False)
     edad = forms.IntegerField(required=False)
-    promedio_bachiller=forms.FloatField(label='Promedio', initial=0.0, widget=forms.TextInput(attrs={'class':style_numeric}), required=False)
+    promedio_bachiller=forms.FloatField(label='Promedio', widget=forms.TextInput(attrs={'class':style_numeric}), required=False)
     curp=forms.CharField(max_length=18,required=False)
     #semestre = forms.ChoiceField(choices=mixins.getCicloSemestral(),widget=forms.Select(attrs={'class': 'form-control'}), required=False,initial=mixins.getSemestreActive())
 
@@ -103,11 +103,15 @@ class AlumnosForm(forms.ModelForm):
         self.fields['edad'].widget.attrs['min'] = 1
         self.fields['sueldo_mensual'].widget.attrs['min'] = 0
         self.fields['sueldo_mensual_alumno'].widget.attrs['min'] = 0
-        self.fields['matricula'].widget.attrs['onfocus']="javascript:Buscar()"
         self.fields['plan'].widget.attrs['onchange']="javascript:Buscar()"
         self.fields['semestre'].widget.attrs['onchange']="javascript:Buscar()"
         self.fields['trabaja_actualmente'].widget.attrs['onchange']="javascript:showContent1()"
-
+        is_insert = self.instance.pk is None
+        if is_insert:
+            self.fields['matricula'].widget.attrs['onfocus'] = "javascript:Buscar()"
+        else:
+            self.fields['email'].widget.attrs['readonly'] = "readonly"
+            self.fields['matricula'].widget.attrs['readonly'] = "readonly"
         self.helper.form_class = 'box box-success'
         self.helper.label_class = 'form-group'
         self.helper.add_input(Submit('submit', 'Guardar'))
@@ -182,7 +186,7 @@ class AlumnosForm(forms.ModelForm):
                 return email
             raise forms.ValidationError("Existe un usuario con este email por favor cambiarlo")
         else:
-            pass
+            self.fields['email'].widget.attrs['readonly'] = "readonly"
         return email
 
 class ReinscripcionAlumnoForm(forms.ModelForm):
@@ -190,7 +194,7 @@ class ReinscripcionAlumnoForm(forms.ModelForm):
         model = Alumnos
         fields = '__all__'
         widgets = {
-            'fecha_nacimiento': forms.DateInput(attrs={'placeholder': 'dd/mm/aaaa','class': 'datepicker ui-widget ui-widget-content date-field'}),
+            'fecha_nacimiento': forms.DateInput(format='%d/%m/%Y', attrs={'placeholder': 'dd/mm/aaaa','class': 'datepicker ui-widget ui-widget-content date-field'}),
         }
 
 
@@ -225,10 +229,11 @@ class ReinscripcionAlumnoForm(forms.ModelForm):
         self.fields['plan'].widget.attrs['onchange']="javascript:Buscar()"
         self.fields['semestre'].widget.attrs['onchange']="javascript:Buscar()"
         self.fields['trabaja_actualmente'].widget.attrs['onchange']="javascript:showContent1()"
-
+        self.fields['email'].widget.attrs['readonly'] = "readonly"
         self.helper.form_class = 'box box-success'
         self.helper.label_class = 'form-group'
         self.helper.add_input(Submit('submit', 'Guardar'))
+
 
 
         self.helper.layout = Layout(
